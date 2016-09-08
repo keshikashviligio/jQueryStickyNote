@@ -1,0 +1,38 @@
+{
+  "name": "jquerystickynote",
+  "description": "jQuery Responsive Sticky Note plugin",
+  "main": "",
+  "authors": [
+    {
+      "name": "Giorgi Keshikashvili",
+      "email": "keshikashviligio@gmail.com",
+      "homepage": "https://github.com/kocoia"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "jQuery",
+    "plugin",
+    "sticky",
+    "note",
+    "notes",
+    "css3",
+    "animation",
+    "window",
+    "ajax",
+    "loading"
+  ],
+  "homepage": "https://github.com/kocoia/jQueyStickyNote",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "1.9.1 - 2"
+  }
+}
