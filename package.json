@@ -4,7 +4,7 @@
   "description": "jQuery Responsive Sticky Note plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kocoia/jQueyStickyNote"
+    "url": "https://github.com/keshikashvili-gio/jQueryStickyNote"
   },
   "keywords": [
     "jQuery",
@@ -21,7 +21,7 @@
   "author": {
     "name": "Giorgi Keshikashvili",
     "email": "keshikashviligio@gmail.com",
-    "url": "https://github.com/kocoia"
+    "url": "https://github.com/keshikashvili-gio"
   },
   "license": "MIT",
   "devDependencies": {

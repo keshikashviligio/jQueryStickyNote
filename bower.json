@@ -6,7 +6,7 @@
     {
       "name": "Giorgi Keshikashvili",
       "email": "keshikashviligio@gmail.com",
-      "homepage": "https://github.com/kocoia"
+      "homepage": "https://github.com/keshikashvili-gio"
     }
   ],
   "license": "MIT",
@@ -22,7 +22,7 @@
     "ajax",
     "loading"
   ],
-  "homepage": "https://github.com/kocoia/jQueyStickyNote",
+  "homepage": "https://github.com/keshikashvili-gio/jQueryStickyNote",
   "moduleType": [],
   "private": true,
   "ignore": [
