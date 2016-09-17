@@ -1,2 +1,2 @@
-# jQueyStickyNote
+# jQueryStickyNote
 jQuery Sticky Notes 
