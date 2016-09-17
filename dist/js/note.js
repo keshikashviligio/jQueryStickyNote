@@ -6,60 +6,56 @@
  * Licensed under MIT (https://github.com/keshikashvili-gio/jQueryStickyNote/master/LICENSE)
  * ======================================================================== */
 
-var Note = Note || {};
+note = {};
 
 +function ($) {
     'use strict';
 
-    Note = function (container) {
-        this.id          = this.uniqueId();
-        this.$container  = $(container);
-        this.width       = 250;
-        this.height      = 200;
-        this.x           = 500;
-        this.y           = 500;
-        this.theme       = null;
-        this.text        = null;
+    note.Note = function (container, data) {
+        console.log(data);
+        this.$container = $(container);
+        this.id = data.id;
+        this.width = data.width;
+        this.height = data.height;
+        this.x = data.x;
+        this.y = data.y;
+        this.theme = data.theme;
+        this.text = data.text;
+
+        this.$note = null;
 
         this.init();
     };
+    note.Note.prototype = {
+        constructor: note.Note,
 
+        init: function () {
+            this.createNote();
+        },
 
-    Note.COLORS = {
-        blue: "#BFE0F5",
-        green: "#C2F4BD",
-        pink: "#F0BFF0",
-        purple: "#D1C8FE",
-        white: "#F4F4F4",
-        yellow: "#FDFBB6"
-    };
+        createNote: function () {
+           this.$note = $(this.getHtml(this.id, this.theme, this.width, this.height, this.x, this.y, this.text));
+           return this;
+        },
 
+        getNote: function(){
+           return this.$note;
+        },
 
-    Note.prototype.init = function () {
-        this.theme = Note.COLORS.yellow;
-        this.createNote();
-    };
+        run: function(){
+            this.$container.append(this.getNote());
+        },
 
-
-    Note.prototype.createNote = function () {
-         this.$container.append(this.getTemplate(this.theme, this.width, this.height, this.id, this.text));
-
-    };
-
-
-    Note.prototype.uniqueId = function(){
-        return this.id ? this.id + 1 : 1;
-    };
-
-
-    Note.prototype.getTemplate = function(theme, width, height, id, text){
-        return '<div id="note-'+id+'" class="jquery-sticky-note theme-'+theme+'" style="width:'+width+';height:'+height+'">' +
+        getHtml: function (id, theme, width, height, x, y, text) {
+            return  '<div id="note-' + id + '" class="jquery-sticky-note theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;left:' + x + 'px;top:' + y + 'px;">' +
                     '<div class="sticky-note-header">' +
-                        '<a href="javascript:" class="add-new-note">+</a>' +
-                        '<a href="javascript:" class="remove-note">x</a>' +
+                    '<a href="javascript:" class="add-new-note">+</a>' +
+                    '<a href="javascript:" class="remove-note">x</a>' +
                     '</div>' +
-                    '<div class="sticky-note-body">'+text+'</div>' +
-               '</div>';
-    };
+                    '<div class="sticky-note-body">' + text + '</div>' +
+                    '</div>';
+        }
+    }
+
 
 }(jQuery);

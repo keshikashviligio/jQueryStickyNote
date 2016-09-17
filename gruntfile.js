@@ -26,7 +26,12 @@ module.exports = function(grunt){
         
         concat: {
             js: {
-                src: ['src/js/note.js', 'src/js/noteManager.js'],
+                src: [
+                    'src/js/note.js',
+                    'src/js/abstractDbController.js',
+                    'src/js/dbLocalStorageController.js',
+                    'src/js/dbBackendController.js',
+                    'src/js/noteManager.js'],
                 dest: 'src/js/<%= pkg.name %>.js'
             }
         },
@@ -37,7 +42,13 @@ module.exports = function(grunt){
                     {
                         expand: true,
                         cwd: 'src/js',
-                        src: ['*.js', 'bower_components/jquery/dist/jquery.js'],
+                        src: ['*.js'],
+                        dest: 'dist/js'
+                    },
+                    {
+                        expand: true,
+                        cwd: 'bower_components/jquery/dist',
+                        src: ['jquery.js'],
                         dest: 'dist/js'
                     }
                 ]

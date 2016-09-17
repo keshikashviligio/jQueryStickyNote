@@ -3,14 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>jQuery Sticky Note</title>
-    <link rel="stylesheet" href="../src/css/jQueryStickyNote.css">
+    <link rel="stylesheet" href="../dist/css/jQueryStickyNote.css">
+    <style>
+        html,body{
+            height: 100%;
+
+        }
+        .notes{
+            position: relative;
+            width: 50%;
+            height: 100%;
+            border-right: 1px solid #8A6343;
+            float: left;
+            box-sizing: border-box;
+        }
+        .notes1{
+            position: relative;
+            width: 50%;
+            height: 100%;
+           // border-right: 1px solid #8A6343;
+            float: left;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <div class="notes">
-
+        <h1>Draggable Notes</h1>
+    </div>
+    <div class="notes1">
+        <h1>Static Notes</h1>
     </div>
 </body>
-<script src="../bower_components/jquery/dist/jquery.js"></script>
-<script src="../src/js/jQueryStickyNote.js"></script>
+<script src="../dist/js/jquery.js"></script>
+<script src="../dist/js/jQueryStickyNote.js"></script>
 <script src="demo.js"></script>
 </html>

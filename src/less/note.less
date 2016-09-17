@@ -1,0 +1,65 @@
+.jquery-sticky-note{
+  height: 180px;
+  width: 166px;
+  position: absolute;
+  overflow: hidden;
+  font-family: sans-serif;
+  font-size: 22px;
+  .box-shadow(0px 1px 7px #c7c7c7);
+  resize: both;
+  &.theme-blue{
+    background-color: @blue;
+    .sticky-note-header{
+      background-color: darken(@blue, 10%);
+    }
+  }
+  &.theme-green{
+    background-color: @green;
+    .sticky-note-header{
+      background-color: darken(@green, 10%);
+    }
+  }
+  &.theme-pink{
+    background-color: @pink;
+    .sticky-note-header{
+      background-color: darken(@pink, 10%);
+    }
+  }
+  &.theme-purple{
+    background-color: @purple;
+    .sticky-note-header{
+      background-color: darken(@purple, 10%);
+    }
+  }
+  &.theme-white{
+    background-color: @white;
+    .sticky-note-header{
+      background-color: darken(@white, 10%);
+    }
+  }
+  &.theme-yellow{
+    background-color: @yellow;
+    .sticky-note-header{
+      background-color: darken(@yellow, 10%);
+    }
+  }
+  .sticky-note-header{
+    font-size: 14px;
+    padding: 5px;
+    line-height: 14px;
+    height: 14px;
+    cursor: move;
+    .remove-note{
+      float: right;
+      text-decoration: none;
+    }
+    .add-new-note{
+      text-decoration: none;
+    }
+  }
+  .sticky-note-body{
+    padding: 10px;
+  }
+
+
+}
