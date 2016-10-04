@@ -134,43 +134,87 @@ window.note = window.note || {};
 
     note.DbLocalStorageService.prototype.constructor = note.DbLocalStorageService;
 
-    note.DbLocalStorageService.prototype.save = function (data) {
-         data.id = parseInt(this._getMaxId() + 1);
+    /**
+     * add new note to localStorage
+     * @param newData
+     */
+    note.DbLocalStorageService.prototype.save = function (newData) {
+        var data = this._getAllFromLocalStorage();
+        newData.id = parseInt(this._getMaxId() + 1);
+         data.push(newData);
          this._saveToLocalStorage(data);
     };
 
-    note.DbLocalStorageService.prototype.delete = function () {
-
+    /**
+     * delete note from localStorage
+     * @param id
+     */
+    note.DbLocalStorageController.prototype.delete = function (id) {
+        var data = this._getAllFromLocalStorage();
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].id == id) {
+                data.splice(data[i], 1);
+            }
+        }
+        this._saveToLocalStorage(data);
     };
 
     note.DbLocalStorageService.prototype.deleteAll = function () {
 
     };
 
-    note.DbLocalStorageService.prototype.update = function () {
-
+    /**
+     *
+     * @param updatedData
+     */
+    note.DbLocalStorageController.prototype.update = function (updatedData) {
+        var data = this._getAllFromLocalStorage();
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].id == updatedData.id) {
+                data[i] = updatedData;
+            }
+        }
+        this._saveToLocalStorage(data);
     };
 
     note.DbLocalStorageService.prototype.updateAll = function () {
 
     };
 
-    note.DbLocalStorageService.prototype.getData = function () {
+    /**
+     *
+     * @returns {Array|Object}
+     */
+    note.DbLocalStorageController.prototype.getData = function () {
         return this._getAllFromLocalStorage();
     };
 
-    note.DbLocalStorageService.prototype._saveToLocalStorage = function (obj) {
-        var data = this._getAllFromLocalStorage();
-            data.push(obj);
-        localStorage.setItem(this.options.localStorageKey, JSON.stringify(data));
-    };
-
-    note.DbLocalStorageService.prototype._getAllFromLocalStorage = function () {
+    /**
+     *
+     * @returns {Array|object}
+     * @private
+     */
+    note.DbLocalStorageController.prototype._getAllFromLocalStorage = function () {
         var storage = localStorage.getItem(this.options.localStorageKey);
         return storage ? JSON.parse(storage) : [];
     };
 
-    note.DbLocalStorageService.prototype._getItemFromLocalStorage = function (key) {
+    /**
+     *
+     * @param data
+     * @private
+     */
+    note.DbLocalStorageController.prototype._saveToLocalStorage = function (data) {
+        localStorage.setItem(this.options.localStorageKey, JSON.stringify(data));
+    };
+
+    /**
+     *
+     * @param key
+     * @returns {*}
+     * @private
+     */
+    note.DbLocalStorageController.prototype._getItemFromLocalStorage = function (key) {
         return this._getAllFromLocalStorage()[key];
     };
 
@@ -186,6 +230,7 @@ window.note = window.note || {};
 
 
 }(jQuery);
+
 
 
 /* ========================================================================
