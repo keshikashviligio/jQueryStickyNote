@@ -3,7 +3,7 @@
  */
 $(document).ready(function(){
     $('.notes').jQueryStickyNote({});
-    $('.notes1').jQueryStickyNote({dbLocalStorageOptions: {
-        localStorageKey: '_jq_sticky_note1'
-    }});
+    //$('.notes1').jQueryStickyNote({dbLocalStorageOptions: {
+    //    localStorageKey: '_jq_sticky_note1'
+    //}});
 });

@@ -6,7 +6,7 @@
  * Licensed under MIT (https://github.com/keshikashvili-gio/jQueryStickyNote/master/LICENSE)
  * ======================================================================== */
 
-note = {};
+window.note = {};
 
 +function ($) {
     'use strict';
@@ -61,122 +61,154 @@ note = {};
 }(jQuery);
 
 /* ========================================================================
- * jQueryStickyNote: abstractDbController.js v1.0.0
+ * jQueryStickyNote: abstractDbService.js v1.0.0
  *
  * ========================================================================
  * Copyright 2016
- * Licensed under MIT (https://github.com/keshikashvili-gio/jQueryStickyNote/master/LICENSE)
+ * Licensed under MIT (https://github.com/keshikashviligio/jQueryStickyNote/master/LICENSE)
  * ======================================================================== */
-
+window.note = window.note || {};
 +function ($) {
     'use strict';
 
-    note.DbController = function (options) {
+    note.DbService = function (options) {
 
     };
 
-    note.DbController.prototype = {
-        constructor: note.DbController,
+    note.DbService.prototype = {
+        constructor: note.DbService,
 
-        save: function(data){},
+        /**
+         *
+         * @param data
+         */
+        save: function(data){console.error('SAVE method must be implemented in your DbService class')},
 
-        delete: function(){},
+        /**
+         *
+         * @param item
+         */
+        delete: function(item){console.error('DELETE method must be implemented in your DbService class')},
 
-        deleteAll: function(){},
+        /**
+         *
+         * @param items
+         */
+        deleteAll: function(items){console.error('DELETEALL method must be implemented in your DbService class')},
 
-        update: function(){},
+        /**
+         *
+         * @param item
+         */
+        update: function(item){console.error('UPDATE method must be implemented in your DbService class')},
 
-        updateAll: function(){},
+        /**
+         *
+         * @param items
+         */
+        updateAll: function(items){console.error('UPDATEALL method must be implemented in your DbService class')},
 
-        getData: function(){}
-
+        /**
+         *
+         */
+        getData: function(){console.error('GETDATA method must be implemented in your DbService class')}
     }
 }(jQuery);
 
 /* ========================================================================
- * jQueryStickyNote: abstractDbController.js v1.0.0
+ * jQueryStickyNote: dbLocalStorageService.js v1.0.0
  *
  * ========================================================================
  * Copyright 2016
  * Licensed under MIT (https://github.com/keshikashvili-gio/jQueryStickyNote/master/LICENSE)
  * ======================================================================== */
-
+window.note = window.note || {};
 +function ($) {
     'use strict';
 
-    note.DbLocalStorageController = function (options) {
+    note.DbLocalStorageService = function (options) {
         this.options = options;
     };
 
-    note.DbLocalStorageController.prototype = Object.create(note.DbController.prototype);
+    note.DbLocalStorageService.prototype = Object.create(note.DbService.prototype);
 
-    note.DbLocalStorageController.prototype.constructor = note.DbLocalStorageController;
+    note.DbLocalStorageService.prototype.constructor = note.DbLocalStorageService;
 
-    note.DbLocalStorageController.prototype.save = function (data) {
-        //console.log(data);
-         this._saveToLocalStorage(data)
+    note.DbLocalStorageService.prototype.save = function (data) {
+         data.id = parseInt(this._getMaxId() + 1);
+         this._saveToLocalStorage(data);
     };
 
-    note.DbLocalStorageController.prototype.delete = function () {
-
-    };
-
-    note.DbLocalStorageController.prototype.deleteAll = function () {
+    note.DbLocalStorageService.prototype.delete = function () {
 
     };
 
-    note.DbLocalStorageController.prototype.update = function () {
+    note.DbLocalStorageService.prototype.deleteAll = function () {
 
     };
 
-    note.DbLocalStorageController.prototype.updateAll = function () {
+    note.DbLocalStorageService.prototype.update = function () {
 
     };
 
-    note.DbLocalStorageController.prototype.getData = function () {
+    note.DbLocalStorageService.prototype.updateAll = function () {
+
+    };
+
+    note.DbLocalStorageService.prototype.getData = function () {
         return this._getAllFromLocalStorage();
     };
 
-    note.DbLocalStorageController.prototype._saveToLocalStorage = function (obj) {
+    note.DbLocalStorageService.prototype._saveToLocalStorage = function (obj) {
         var data = this._getAllFromLocalStorage();
             data.push(obj);
         localStorage.setItem(this.options.localStorageKey, JSON.stringify(data));
     };
 
-    note.DbLocalStorageController.prototype._getAllFromLocalStorage = function () {
+    note.DbLocalStorageService.prototype._getAllFromLocalStorage = function () {
         var storage = localStorage.getItem(this.options.localStorageKey);
         return storage ? JSON.parse(storage) : [];
     };
 
-    note.DbLocalStorageController.prototype._getItemFromLocalStorage = function (key) {
+    note.DbLocalStorageService.prototype._getItemFromLocalStorage = function (key) {
         return this._getAllFromLocalStorage()[key];
     };
+
+    note.DbLocalStorageService.prototype._getMaxId = function(){
+        var max = 0;
+        $.each(this.getData(), function(index, item){
+            if(item.id > max){
+                max = item.id;
+            }
+        });
+        return max;
+    }
 
 
 }(jQuery);
 
 
 /* ========================================================================
- * jQueryStickyNote: abstractDbController.js v1.0.0
+ * jQueryStickyNote: dbBackendService.js v1.0.0
  *
  * ========================================================================
  * Copyright 2016
  * Licensed under MIT (https://github.com/keshikashvili-gio/jQueryStickyNote/master/LICENSE)
  * ======================================================================== */
-
+window.note = window.note || {};
 +function ($) {
     'use strict';
 
-    note.DbBackendController = function (options) {
+    note.DbBackendService = function (options) {
         this.options = options;
         this.data = {};
     };
 
-    note.DbBackendController.prototype = Object.create(note.DbController.prototype);
+    note.DbBackendService.prototype = Object.create(note.DbService.prototype);
 
-    note.DbBackendController.prototype.constructor = note.DbBackendController;
+    note.DbBackendService.prototype.constructor = note.DbBackendService;
 
-    note.DbBackendController.prototype.save = function (data) {
+    note.DbBackendService.prototype.save = function (data) {
         var self = this;
          this._post(this.options.postUrl, data).done(function(res){
              if(res.success){
@@ -189,23 +221,23 @@ note = {};
         return self.data;
     };
 
-    note.DbBackendController.prototype.delete = function () {
+    note.DbBackendService.prototype.delete = function () {
 
     };
 
-    note.DbBackendController.prototype.deleteAll = function () {
+    note.DbBackendService.prototype.deleteAll = function () {
 
     };
 
-    note.DbBackendController.prototype.update = function () {
+    note.DbBackendService.prototype.update = function () {
 
     };
 
-    note.DbBackendController.prototype.updateAll = function () {
+    note.DbBackendService.prototype.updateAll = function () {
 
     };
 
-    note.DbBackendController.prototype.getData = function () {
+    note.DbBackendService.prototype.getData = function () {
         var self = this;
         this._get(this.options.loadUrl).done(function(data){
             self.data = data;
@@ -213,7 +245,7 @@ note = {};
         return self.data;
     };
 
-    note.DbBackendController.prototype._get = function (url, data) {
+    note.DbBackendService.prototype._get = function (url, data) {
         return $.ajax({
             url: url,
             type: 'GET',
@@ -221,7 +253,7 @@ note = {};
         });
     };
 
-    note.DbBackendController.prototype._post = function (url, data) {
+    note.DbBackendService.prototype._post = function (url, data) {
         return $.ajax({
             url: url,
             type: 'POST',
@@ -240,8 +272,7 @@ note = {};
  * Copyright 2016
  * Licensed under MIT (https://github.com/keshikashvili-gio/jQueryStickyNote/master/LICENSE)
  * ======================================================================== */
-//window.noteManager = {};
-
+window.note = window.note || {};
 +function ($) {
     'use strict';
 
@@ -249,7 +280,7 @@ note = {};
         this.options = options;
         this.$element = $(element);
         this.notes = {};
-        this.dbController = {};
+        this.dbService = {};
         this.maxId = 1;
         this.init();
     };
@@ -261,17 +292,17 @@ note = {};
             var self = this, savedData;
 
             self.options = $.extend({}, note.NoteManager.DEFAULTS, self.options);
-            if (self.options.dbController === 'dbLocalStorageController') {
-                self.dbController = new note.DbLocalStorageController(self.options.dbLocalStorageOptions);
-            } else if (self.options.dbController === 'dbBackendController') {
-                self.dbController = new note.DbBackendController(self.options.dbBackendOptions);
+            if (self.options.dbService === 'dbLocalStorageService') {
+                self.dbService = new note.DbLocalStorageService(self.options.dbLocalStorageOptions);
+            } else if (self.options.dbService === 'dbBackendService') {
+                self.dbService = new note.DbBackendService(self.options.dbBackendOptions);
             }
-            savedData = self.dbController.getData();
+            savedData = self.dbService.getData();
             if (savedData.length) {
                 self.notes = savedData;
             } else {
                 self.notes = self.options.plainNoteObject;
-                self.dbController.save(self.notes[0]);
+                self.dbService.save(self.notes[0]);
             }
 
             $.each(self.notes, function (i, item) {
@@ -281,20 +312,33 @@ note = {};
         },
 
 
-        attachEvents: function ($element) {
-            $element.find('.add-new-note').on('click', this.openNewNote.bind(this));
+        bindEvents: function ($element) {
+            $element.find('.add-new-note')
+                    .on('click', this.openNewNote.bind(this));
+            $element.find('.remove-note')
+                    .on('click', this.removeNote.bind(this))
         },
 
 
         openNewNote: function () {
             this.createNote(this.options.plainNoteObject[0]);
-            this.dbController.save(this.options.plainNoteObject[0]);
+            this.dbService.save(this.options.plainNoteObject[0]);
         },
 
+        
         createNote: function (object) {
             var Note = new note.Note(this.$element, object);
-            this.attachEvents(Note.$note);
+            this.bindEvents(Note.$note);
+            this.initDrag(Note.$note, this.$element);
             Note.run();
+        },
+
+
+        removeNote: function(event){
+            var note = $(event.target).parents('.jquery-sticky-note');
+            console.log(note);
+            $(note).remove();
+            this.dbService.delete(note);
         },
 
 
@@ -305,6 +349,78 @@ note = {};
 
         toObject: function () {
 
+        },
+
+
+        initDrag: function () {
+            // this is used later in the resizing and gesture demos
+            var self = this;
+            interact('.jquery-sticky-note')
+                .draggable({
+                    onmove: self.dragMoveListener.bind(this),
+                    // enable inertial throwing
+                    inertia: true,
+                    // keep the element within the area of it's parent
+                    restrict: {
+                        restriction: "parent",
+                        endOnly: true,
+                        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+                    },
+                    // enable autoScroll
+                    autoScroll: true,
+                    // call this function on every dragend event
+                    onend: function (event) {
+                        var textEl = event.target.querySelector('p');
+
+                        textEl && (textEl.textContent =
+                            'moved a distance of '
+                            + (Math.sqrt(event.dx * event.dx +
+                                event.dy * event.dy)|0) + 'px');
+                    }
+                })
+                .resizable({
+                    preserveAspectRatio: true,
+                    edges: {left: true, right: true, bottom: true, top: true}
+                })
+                .on('resizemove', self.resizeListener.bind(this));
+        },
+        dragMoveListener: function (event) {
+            console.log('beforeMove');
+            var target = event.target,
+            // keep the dragged position in the data-x/data-y attributes
+                x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+                y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            // translate the element
+            target.style.webkitTransform =
+                target.style.transform =
+                    'translate(' + x + 'px, ' + y + 'px)';
+
+            // update the posiion attributes
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+            console.log('afterMove');
+        },
+        resizeListener: function (event) {
+            console.log('beforeResize');
+            var target = event.target,
+                x = (parseFloat(target.getAttribute('data-x')) || 0),
+                y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+            // update the element's style
+            target.style.width = event.rect.width + 'px';
+            target.style.height = event.rect.height + 'px';
+
+            // translate when resizing from top or left edges
+            x += event.deltaRect.left;
+            y += event.deltaRect.top;
+
+            target.style.webkitTransform = target.style.transform =
+                'translate(' + x + 'px,' + y + 'px)';
+
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+            console.log('afterResize');
         }
     };
 
@@ -318,6 +434,7 @@ note = {};
         'yellow'
     ];
 
+
     note.NoteManager.DEFAULTS = {
         plainNoteObject: [{
             id: 1,
@@ -328,7 +445,7 @@ note = {};
             text: "",
             theme: 'yellow'
         }],
-        dbController: 'dbLocalStorageController', // to server store 'dbBackendController'
+        dbService: 'dbLocalStorageService', // to server store 'dbBackendService'
         dbLocalStorageOptions: {
             localStorageKey: '_jq_sticky_note'
         },
@@ -340,6 +457,7 @@ note = {};
             deleteAllUrl: ''
         }
     };
+
 
     jQuery.fn.jQueryStickyNote = function (options) {
         return new note.NoteManager(this, options);

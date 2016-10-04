@@ -6,7 +6,7 @@
  * Licensed under MIT (https://github.com/keshikashvili-gio/jQueryStickyNote/master/LICENSE)
  * ======================================================================== */
 
-note = {};
+window.note = {};
 
 +function ($) {
     'use strict';

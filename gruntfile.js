@@ -28,9 +28,10 @@ module.exports = function(grunt){
             js: {
                 src: [
                     'src/js/note.js',
-                    'src/js/abstractDbController.js',
-                    'src/js/dbLocalStorageController.js',
-                    'src/js/dbBackendController.js',
+                    'src/js/abstractDbService.js',
+                    'src/js/dbLocalStorageService.js',
+                    'src/js/dbBackendService.js',
+                    'src/js/draggable.js',
                     'src/js/noteManager.js'],
                 dest: 'src/js/<%= pkg.name %>.js'
             }
@@ -49,6 +50,12 @@ module.exports = function(grunt){
                         expand: true,
                         cwd: 'bower_components/jquery/dist',
                         src: ['jquery.js'],
+                        dest: 'dist/js'
+                    },
+                    {
+                        expand: true,
+                        cwd: 'bower_components/interact/dist',
+                        src: ['interact.js'],
                         dest: 'dist/js'
                     }
                 ]
