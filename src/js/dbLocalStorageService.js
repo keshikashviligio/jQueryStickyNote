@@ -32,13 +32,16 @@ window.note = window.note || {};
      * delete note from localStorage
      * @param id
      */
-    note.DbLocalStorageController.prototype.delete = function (id) {
+    note.DbLocalStorageService.prototype.delete = function (id) {
         var data = this._getAllFromLocalStorage();
         for (var i = 0; i < data.length; i++) {
             if (data[i].id == id) {
-                data.splice(data[i], 1);
+                data.splice(i, 1);
+                // console.log('if');
             }
         }
+        // console.log(data);
+        // console.log(id);
         this._saveToLocalStorage(data);
     };
 
@@ -50,13 +53,14 @@ window.note = window.note || {};
      *
      * @param updatedData
      */
-    note.DbLocalStorageController.prototype.update = function (updatedData) {
+    note.DbLocalStorageService.prototype.update = function (updatedData) {
         var data = this._getAllFromLocalStorage();
         for (var i = 0; i < data.length; i++) {
             if (data[i].id == updatedData.id) {
                 data[i] = updatedData;
             }
         }
+        console.log(updatedData);
         this._saveToLocalStorage(data);
     };
 
@@ -68,7 +72,7 @@ window.note = window.note || {};
      *
      * @returns {Array|Object}
      */
-    note.DbLocalStorageController.prototype.getData = function () {
+    note.DbLocalStorageService.prototype.getData = function () {
         return this._getAllFromLocalStorage();
     };
 
@@ -77,7 +81,7 @@ window.note = window.note || {};
      * @returns {Array|object}
      * @private
      */
-    note.DbLocalStorageController.prototype._getAllFromLocalStorage = function () {
+    note.DbLocalStorageService.prototype._getAllFromLocalStorage = function () {
         var storage = localStorage.getItem(this.options.localStorageKey);
         return storage ? JSON.parse(storage) : [];
     };
@@ -87,7 +91,7 @@ window.note = window.note || {};
      * @param data
      * @private
      */
-    note.DbLocalStorageController.prototype._saveToLocalStorage = function (data) {
+    note.DbLocalStorageService.prototype._saveToLocalStorage = function (data) {
         localStorage.setItem(this.options.localStorageKey, JSON.stringify(data));
     };
 
@@ -97,7 +101,7 @@ window.note = window.note || {};
      * @returns {*}
      * @private
      */
-    note.DbLocalStorageController.prototype._getItemFromLocalStorage = function (key) {
+    note.DbLocalStorageService.prototype._getItemFromLocalStorage = function (key) {
         return this._getAllFromLocalStorage()[key];
     };
 

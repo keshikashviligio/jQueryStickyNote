@@ -47,13 +47,33 @@ window.note = {};
         },
 
         getHtml: function (id, theme, width, height, x, y, text) {
-            return  '<div id="note-' + id + '" class="jquery-sticky-note theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;left:' + x + 'px;top:' + y + 'px;">' +
+            return  '<div id="note-' + id + '" data-id="'+id+'" data-x="'+x+'" data-y="'+y+'" class="jquery-sticky-note theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;-webkit-transform: translate('+x+'px, '+y+'px);transform: translate('+x+'px, '+y+'px);">' +
                     '<div class="sticky-note-header">' +
                     '<a href="javascript:" class="add-new-note">+</a>' +
                     '<a href="javascript:" class="remove-note">x</a>' +
                     '</div>' +
                     '<div class="sticky-note-body">' + text + '</div>' +
                     '</div>';
+        },
+        
+        htmlToObject: function (html) {
+            html = $(html);
+            var theme = this.getHTmlClass(html[0].className, "theme-\\w+");
+                theme = theme.substr(theme.indexOf('-')+1);
+            return {
+                id: html.data('id'),
+                width: html.width(),
+                height: html.height(),
+                x: html.attr('data-x'),
+                y: html.attr('data-y'),
+                text: html.find('.sticky-note-body').text(),
+                theme: theme
+            }
+        },
+        getHTmlClass : function(str, klass) {
+            var r = new RegExp("(?:^| )(" + klass + ")(?: |$)")
+                , m = (""+str).match(r);
+            return (m) ? m[1] : null;
         }
     }
 
@@ -149,13 +169,16 @@ window.note = window.note || {};
      * delete note from localStorage
      * @param id
      */
-    note.DbLocalStorageController.prototype.delete = function (id) {
+    note.DbLocalStorageService.prototype.delete = function (id) {
         var data = this._getAllFromLocalStorage();
         for (var i = 0; i < data.length; i++) {
             if (data[i].id == id) {
-                data.splice(data[i], 1);
+                data.splice(i, 1);
+                // console.log('if');
             }
         }
+        // console.log(data);
+        // console.log(id);
         this._saveToLocalStorage(data);
     };
 
@@ -167,13 +190,14 @@ window.note = window.note || {};
      *
      * @param updatedData
      */
-    note.DbLocalStorageController.prototype.update = function (updatedData) {
+    note.DbLocalStorageService.prototype.update = function (updatedData) {
         var data = this._getAllFromLocalStorage();
         for (var i = 0; i < data.length; i++) {
             if (data[i].id == updatedData.id) {
                 data[i] = updatedData;
             }
         }
+        console.log(updatedData);
         this._saveToLocalStorage(data);
     };
 
@@ -185,7 +209,7 @@ window.note = window.note || {};
      *
      * @returns {Array|Object}
      */
-    note.DbLocalStorageController.prototype.getData = function () {
+    note.DbLocalStorageService.prototype.getData = function () {
         return this._getAllFromLocalStorage();
     };
 
@@ -194,7 +218,7 @@ window.note = window.note || {};
      * @returns {Array|object}
      * @private
      */
-    note.DbLocalStorageController.prototype._getAllFromLocalStorage = function () {
+    note.DbLocalStorageService.prototype._getAllFromLocalStorage = function () {
         var storage = localStorage.getItem(this.options.localStorageKey);
         return storage ? JSON.parse(storage) : [];
     };
@@ -204,7 +228,7 @@ window.note = window.note || {};
      * @param data
      * @private
      */
-    note.DbLocalStorageController.prototype._saveToLocalStorage = function (data) {
+    note.DbLocalStorageService.prototype._saveToLocalStorage = function (data) {
         localStorage.setItem(this.options.localStorageKey, JSON.stringify(data));
     };
 
@@ -214,7 +238,7 @@ window.note = window.note || {};
      * @returns {*}
      * @private
      */
-    note.DbLocalStorageController.prototype._getItemFromLocalStorage = function (key) {
+    note.DbLocalStorageService.prototype._getItemFromLocalStorage = function (key) {
         return this._getAllFromLocalStorage()[key];
     };
 
@@ -310,6 +334,251 @@ window.note = window.note || {};
 }(jQuery);
 
 
+/**
+ * Created by koco on 10/5/2016.
+ */
+window.note = window.note || {};
++(function () {
+
+    "use strict";
+
+
+    note.ContextMenu = function (menuItems, options) {
+        /**
+         * Variables.
+         */
+
+        this.contextMenuClassName = "context-menu";
+        this.contextMenuItemClassName = "context-menu__item";
+        this.contextMenuLinkClassName = "context-menu__link";
+        this.contextMenuActive = "context-menu--active";
+
+        this.taskItemClassName = "jquery-sticky-note";
+        this.taskItemInContext = "";
+
+        this.clickCoords = 0;
+        this.clickCoordsX = 0;
+        this.clickCoordsY = 0;
+
+        this.menu = document.querySelector("#context-menu");
+        this.menuItems = this.menu.querySelectorAll(".context-menu__item");
+        this.menuState = 0;
+        this.menuWidth = 0;
+        this.menuHeight = 0;
+        this.menuPosition = 0;
+        this.menuPositionX = 0;
+        this.menuPositionY = 0;
+
+        this.windowWidth = 0;
+        this.windowHeight = 0;
+
+        this.init();
+    };
+
+
+    note.ContextMenu.prototype = {
+        constructor: note.ContextMenu,
+
+        //////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+        //
+        // C O R E    F U N C T I O N S
+        //
+        //////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * Initialise our application's code.
+         */
+        init: function () {
+            this.contextListener();
+            this.clickListener();
+            this.keyupListener();
+            this.resizeListener();
+        },
+
+        /* Listens for contextmenu events.
+         */
+        contextListener: function () {
+            var self = this;
+
+            document.addEventListener("contextmenu", function (e) {
+                self.taskItemInContext = self.clickInsideElement(e, self.taskItemClassName);
+
+                if (self.taskItemInContext) {
+                    e.preventDefault();
+                    self.toggleMenuOn();
+                    self.positionMenu(e);
+                } else {
+                    self.taskItemInContext = null;
+                    self.toggleMenuOff();
+                }
+            });
+        },
+        /**
+         * Listens for click events.
+         */
+        clickListener: function () {
+            var self = this;
+            document.addEventListener("click", function (e) {
+
+                var clickeElIsLink = self.clickInsideElement(e, this.contextMenuLinkClassName);
+
+                if (clickeElIsLink) {
+                    e.preventDefault();
+                    self.menuItemListener(clickeElIsLink);
+                } else {
+                    var button = e.which || e.button;
+                    if (button === 1) {
+                        self.toggleMenuOff();
+                    }
+                }
+            });
+        },
+
+        /**
+         * Listens for keyup events.
+         */
+        keyupListener: function () {
+            var self = this;
+            window.onkeyup = function (e) {
+                if (e.keyCode === 27) {
+                    self.toggleMenuOff();
+                }
+            }
+        },
+
+        /**
+         * Window resize event listener
+         */
+        resizeListener: function () {
+            var self = this;
+            window.onresize = function (e) {
+                self.toggleMenuOff();
+            };
+        },
+
+        /**
+         * Turns the custom context menu on.
+         */
+        toggleMenuOn: function () {
+            if (this.menuState !== 1) {
+                this.menuState = 1;
+                this.menu.classList.add(this.contextMenuActive);
+            }
+        },
+
+        /**
+         * Turns the custom context menu off.
+         */
+        toggleMenuOff: function () {
+            if (this.menuState !== 0) {
+                this.menuState = 0;
+                this.menu.classList.remove(this.contextMenuActive);
+            }
+        },
+
+        /**
+         * Positions the menu properly.
+         *
+         * @param {Object} e The event
+         */
+        positionMenu: function (e) {
+            this.clickCoords = this.getPosition(e);
+            this.clickCoordsX =  this.clickCoords.x;
+            this.clickCoordsY =  this.clickCoords.y;
+
+            this.menuWidth = this.menu.offsetWidth + 4;
+            this.menuHeight = this.menu.offsetHeight + 4;
+
+            this.windowWidth = window.innerWidth;
+            this.windowHeight = window.innerHeight;
+
+            if ((this.windowWidth - this.clickCoordsX) < this.menuWidth) {
+                this.menu.style.left = this.windowWidth - this.menuWidth + "px";
+            } else {
+                this.menu.style.left = this.clickCoordsX + "px";
+            }
+
+            if ((this.windowHeight - this.clickCoordsY) < this.menuHeight) {
+                this.menu.style.top = this.windowHeight - this.menuHeight + "px";
+            } else {
+                this.menu.style.top = this.clickCoordsY + "px";
+            }
+        },
+
+        /**
+         * Dummy action function that logs an action when a menu item link is clicked
+         *
+         * @param {HTMLElement} link The link that was clicked
+         */
+        menuItemListener: function (link) {
+            console.log("Task ID - " + this.taskItemInContext.getAttribute("data-id") + ", Task action - " + link.getAttribute("data-action"));
+            this.toggleMenuOff();
+        },
+
+        //////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+        //
+        // H E L P E R    F U N C T I O N S
+        //
+        //////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * Function to check if we clicked inside an element with a particular class
+         * name.
+         *
+         * @param {Object} e The event
+         * @param {String} className The class name to check against
+         * @return {Boolean}
+         */
+        clickInsideElement: function (e, className) {
+            var el = e.srcElement || e.target;
+
+            if (el.classList.contains(className)) {
+                return el;
+            } else {
+                while (el = el.parentNode) {
+                    if (el.classList && el.classList.contains(className)) {
+                        return el;
+                    }
+                }
+            }
+
+            return false;
+        }
+        ,
+
+        /**
+         * Get's exact position of event.
+         *
+         * @param {Object} e The event passed in
+         * @return {Object} Returns the x and y position
+         */
+        getPosition: function (e) {
+            var posx = 0;
+            var posy = 0;
+
+            if (!e) e = window.event;
+
+            if (e.pageX || e.pageY) {
+                posx = e.pageX;
+                posy = e.pageY;
+            } else if (e.clientX || e.clientY) {
+                posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+                posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+            }
+
+            return {
+                x: posx,
+                y: posy
+            }
+        }
+
+    };
+
+})();
 /* ========================================================================
  * jQueryStickyNote v1.0.0
  *
@@ -327,6 +596,8 @@ window.note = window.note || {};
         this.notes = {};
         this.dbService = {};
         this.maxId = 1;
+        this.eventDelaytimer = 0;
+        this.eventDelaytimerMs = 300;
         this.init();
     };
     note.NoteManager.prototype = {
@@ -354,14 +625,25 @@ window.note = window.note || {};
                 self.createNote(item);
             });
 
+            var menu = new note.ContextMenu();
+
+            this.$element.on('sn-afterMove', function (element, data) {
+                console.log('on-sn-afterMove');
+                console.log(element, data);
+            })
+            this.$element.on('sn-afterResize', function (element, data) {
+                console.log('on-sn-afterResize');
+                console.log(element, data);
+            })
+
         },
 
 
         bindEvents: function ($element) {
             $element.find('.add-new-note')
-                    .on('click', this.openNewNote.bind(this));
+                .on('click', this.openNewNote.bind(this));
             $element.find('.remove-note')
-                    .on('click', this.removeNote.bind(this))
+                .on('click', this.removeNote.bind(this));
         },
 
 
@@ -370,7 +652,7 @@ window.note = window.note || {};
             this.dbService.save(this.options.plainNoteObject[0]);
         },
 
-        
+
         createNote: function (object) {
             var Note = new note.Note(this.$element, object);
             this.bindEvents(Note.$note);
@@ -379,11 +661,15 @@ window.note = window.note || {};
         },
 
 
-        removeNote: function(event){
+        updateNote: function (updatedData) {
+            this.dbService.update(updatedData);
+        },
+
+        removeNote: function (event) {
             var note = $(event.target).parents('.jquery-sticky-note');
             console.log(note);
             $(note).remove();
-            this.dbService.delete(note);
+            this.dbService.delete($(note).data('id'));
         },
 
 
@@ -409,7 +695,7 @@ window.note = window.note || {};
                     restrict: {
                         restriction: "parent",
                         endOnly: true,
-                        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+                        elementRect: {top: 0, left: 0, bottom: 1, right: 1}
                     },
                     // enable autoScroll
                     autoScroll: true,
@@ -420,38 +706,49 @@ window.note = window.note || {};
                         textEl && (textEl.textContent =
                             'moved a distance of '
                             + (Math.sqrt(event.dx * event.dx +
-                                event.dy * event.dy)|0) + 'px');
+                                event.dy * event.dy) | 0) + 'px');
                     }
                 })
                 .resizable({
-                    preserveAspectRatio: true,
+                    //preserveAspectRatio: true,
                     edges: {left: true, right: true, bottom: true, top: true}
                 })
                 .on('resizemove', self.resizeListener.bind(this));
         },
         dragMoveListener: function (event) {
-            console.log('beforeMove');
+
+            var self = this;
             var target = event.target,
-            // keep the dragged position in the data-x/data-y attributes
+                // keep the dragged position in the data-x/data-y attributes
                 x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
                 y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
+            console.log('sn-beforeMove');
+            self.$element.trigger('sn-beforeMove', target, event);
             // translate the element
-            target.style.webkitTransform =
-                target.style.transform =
-                    'translate(' + x + 'px, ' + y + 'px)';
+            target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
 
             // update the posiion attributes
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
-            console.log('afterMove');
+
+            //save updated data
+            this.setEventDelay(function () {
+                console.log('sn-afterMove');
+                var data = note.Note.prototype.htmlToObject(target);
+                self.$element.trigger('sn-afterMove', target, data);
+                self.updateNote(data);
+            }, this.eventDelaytimerMs);
+
         },
         resizeListener: function (event) {
-            console.log('beforeResize');
+            var self = this;
             var target = event.target,
                 x = (parseFloat(target.getAttribute('data-x')) || 0),
                 y = (parseFloat(target.getAttribute('data-y')) || 0);
 
+            console.log('sn-beforeResize');
+            self.$element.trigger('sn-beforeResize', target, event);
             // update the element's style
             target.style.width = event.rect.width + 'px';
             target.style.height = event.rect.height + 'px';
@@ -465,18 +762,28 @@ window.note = window.note || {};
 
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
-            console.log('afterResize');
+            this.setEventDelay(function () {
+                console.log('sn-afterResize');
+                var data = note.Note.prototype.htmlToObject(target);
+                self.$element.trigger('sn-afterResize', target, data);
+                self.updateNote(data);
+            }, this.eventDelaytimerMs);
+
+        },
+        setEventDelay: function (callback, ms) {
+            clearTimeout(this.eventDelaytimer);
+            this.eventDelaytimer = setTimeout(callback, ms);
         }
     };
 
 
     note.NoteManager.THEMES = [
-        'blue',
-        'green',
-        'pink',
-        'purple',
-        'white',
-        'yellow'
+        {'blue': '#BFE0F5'},
+        {'green': '#C2F4BD'},
+        {'pink': '#F0BFF0'},
+        {'purple': '#D1C8FE'},
+        {'white': '#F4F4F4'},
+        {'yellow': '#FDFBB6'}
     ];
 
 
