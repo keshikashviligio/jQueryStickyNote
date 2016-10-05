@@ -344,9 +344,10 @@ window.note = window.note || {};
 
 
     note.ContextMenu = function (menuItems, options) {
-        /**
-         * Variables.
-         */
+
+        this.menuItems      = menuItems;
+        this.option         = $.extend({}, note.ContextMenu.OPTIONS, options);
+        $('body').append(this.getMenuHtml(this.menuItems));
 
         this.contextMenuClassName = "context-menu";
         this.contextMenuItemClassName = "context-menu__item";
@@ -359,6 +360,8 @@ window.note = window.note || {};
         this.clickCoords = 0;
         this.clickCoordsX = 0;
         this.clickCoordsY = 0;
+
+
 
         this.menu = document.querySelector("#context-menu");
         this.menuItems = this.menu.querySelectorAll(".context-menu__item");
@@ -373,6 +376,11 @@ window.note = window.note || {};
         this.windowHeight = 0;
 
         this.init();
+    };
+
+    note.ContextMenu.OPTIONS = {
+        itemClickCallback: function () {},
+        menuOwnerActiveClass: '.context-menu-open'
     };
 
 
@@ -409,9 +417,12 @@ window.note = window.note || {};
                     e.preventDefault();
                     self.toggleMenuOn();
                     self.positionMenu(e);
+                    $(self.taskItemInContext).addClass(self.option.menuOwnerActiveClass);
+                    console.log('open');
                 } else {
                     self.taskItemInContext = null;
                     self.toggleMenuOff();
+                    console.log('close');
                 }
             });
         },
@@ -421,12 +432,12 @@ window.note = window.note || {};
         clickListener: function () {
             var self = this;
             document.addEventListener("click", function (e) {
-
-                var clickeElIsLink = self.clickInsideElement(e, this.contextMenuLinkClassName);
-
-                if (clickeElIsLink) {
+                var clickElIsLink = self.clickInsideElement(e, self.contextMenuLinkClassName);
+                //console.log(clickElIsLink);
+                if (clickElIsLink) {
                     e.preventDefault();
-                    self.menuItemListener(clickeElIsLink);
+                    //console.log('click');
+                    self.menuItemListener(e, clickElIsLink);
                 } else {
                     var button = e.which || e.button;
                     if (button === 1) {
@@ -475,6 +486,7 @@ window.note = window.note || {};
             if (this.menuState !== 0) {
                 this.menuState = 0;
                 this.menu.classList.remove(this.contextMenuActive);
+                $(this.option.menuOwnerActiveClass).removeClass(this.option.menuOwnerActiveClass);
             }
         },
 
@@ -510,10 +522,14 @@ window.note = window.note || {};
         /**
          * Dummy action function that logs an action when a menu item link is clicked
          *
+         * @param e
          * @param {HTMLElement} link The link that was clicked
          */
-        menuItemListener: function (link) {
-            console.log("Task ID - " + this.taskItemInContext.getAttribute("data-id") + ", Task action - " + link.getAttribute("data-action"));
+        menuItemListener: function (e, link) {
+            if(typeof this.option.itemClickCallback == 'function'){
+                var menuOwner = $(this.option.menuOwnerActiveClass);
+                this.option.itemClickCallback.call(null, e, link, menuOwner);
+            }
             this.toggleMenuOff();
         },
 
@@ -545,6 +561,7 @@ window.note = window.note || {};
                     }
                 }
             }
+            //console.log(e, className);
 
             return false;
         }
@@ -574,6 +591,17 @@ window.note = window.note || {};
                 x: posx,
                 y: posy
             }
+        },
+
+
+        getMenuHtml: function (menuItems) {
+          var html = '<nav id="context-menu" class="context-menu"><ul class="context-menu__items">';
+              for(var i = 0; i < menuItems.length; i++){
+                  html += '<li class="context-menu__item">'+
+                            '<a href="#" class="context-menu__link" data-key="'+menuItems[i].name+'" data-value="'+menuItems[i].value+'"><span style="background-color:'+menuItems[i].value+'"></span>'+menuItems[i].name+'</a>'+
+                          '</li>';
+              }
+              return html +='</ul></nav>';
         }
 
     };
@@ -625,7 +653,9 @@ window.note = window.note || {};
                 self.createNote(item);
             });
 
-            var menu = new note.ContextMenu();
+            var menu = new note.ContextMenu(note.NoteManager.THEMES, {
+                itemClickCallback: self.themeChangeClickListener.bind(this)
+            });
 
             this.$element.on('sn-afterMove', function (element, data) {
                 console.log('on-sn-afterMove');
@@ -770,6 +800,17 @@ window.note = window.note || {};
             }, this.eventDelaytimerMs);
 
         },
+
+
+        themeChangeClickListener: function () {
+            var event = arguments[0], link = arguments[1], $note = $(arguments[2]);
+            console.log($note)
+            var currentTheme = note.Note.prototype.getHTmlClass($note[0].className, "theme-\\w+");
+            $note.removeClass(currentTheme).addClass('theme-' + $(link).data('key'));
+            this.dbService.update(note.Note.prototype.htmlToObject($note));
+        },
+
+
         setEventDelay: function (callback, ms) {
             clearTimeout(this.eventDelaytimer);
             this.eventDelaytimer = setTimeout(callback, ms);
@@ -778,12 +819,12 @@ window.note = window.note || {};
 
 
     note.NoteManager.THEMES = [
-        {'blue': '#BFE0F5'},
-        {'green': '#C2F4BD'},
-        {'pink': '#F0BFF0'},
-        {'purple': '#D1C8FE'},
-        {'white': '#F4F4F4'},
-        {'yellow': '#FDFBB6'}
+        {name: 'blue', value: '#BFE0F5'},
+        {name: 'green', value: '#C2F4BD'},
+        {name: 'pink', value: '#F0BFF0'},
+        {name: 'purple', value: '#D1C8FE'},
+        {name: 'white', value: '#F4F4F4'},
+        {name: 'yellow', value: '#FDFBB6'}
     ];
 
 

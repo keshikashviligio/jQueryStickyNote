@@ -44,7 +44,9 @@ window.note = window.note || {};
                 self.createNote(item);
             });
 
-            var menu = new note.ContextMenu();
+            var menu = new note.ContextMenu(note.NoteManager.THEMES, {
+                itemClickCallback: self.themeChangeClickListener.bind(this)
+            });
 
             this.$element.on('sn-afterMove', function (element, data) {
                 console.log('on-sn-afterMove');
@@ -189,6 +191,17 @@ window.note = window.note || {};
             }, this.eventDelaytimerMs);
 
         },
+
+
+        themeChangeClickListener: function () {
+            var event = arguments[0], link = arguments[1], $note = $(arguments[2]);
+            console.log($note)
+            var currentTheme = note.Note.prototype.getHTmlClass($note[0].className, "theme-\\w+");
+            $note.removeClass(currentTheme).addClass('theme-' + $(link).data('key'));
+            this.dbService.update(note.Note.prototype.htmlToObject($note));
+        },
+
+
         setEventDelay: function (callback, ms) {
             clearTimeout(this.eventDelaytimer);
             this.eventDelaytimer = setTimeout(callback, ms);
@@ -197,12 +210,12 @@ window.note = window.note || {};
 
 
     note.NoteManager.THEMES = [
-        {'blue': '#BFE0F5'},
-        {'green': '#C2F4BD'},
-        {'pink': '#F0BFF0'},
-        {'purple': '#D1C8FE'},
-        {'white': '#F4F4F4'},
-        {'yellow': '#FDFBB6'}
+        {name: 'blue', value: '#BFE0F5'},
+        {name: 'green', value: '#C2F4BD'},
+        {name: 'pink', value: '#F0BFF0'},
+        {name: 'purple', value: '#D1C8FE'},
+        {name: 'white', value: '#F4F4F4'},
+        {name: 'yellow', value: '#FDFBB6'}
     ];
 
 
