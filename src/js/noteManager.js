@@ -48,23 +48,28 @@ window.note = window.note || {};
                 itemClickCallback: self.themeChangeClickListener.bind(this)
             });
 
-            this.$element.on('sn-afterMove', function (element, data) {
-                console.log('on-sn-afterMove');
-                console.log(element, data);
-            })
-            this.$element.on('sn-afterResize', function (element, data) {
-                console.log('on-sn-afterResize');
-                console.log(element, data);
-            })
+            // this.$element.on('sn-afterMove', function (element, data) {
+            //     console.log('on-sn-afterMove');
+            //     console.log(element, data);
+            // })
+            // this.$element.on('sn-afterResize', function (element, data) {
+            //     console.log('on-sn-afterResize');
+            //     console.log(element, data);
+            // })
 
         },
 
 
         bindEvents: function ($element) {
-            $element.find('.add-new-note')
+            $element.find('.sn-btn-add-new')
                 .on('click', this.openNewNote.bind(this));
-            $element.find('.remove-note')
+            $element.find('.sn-btn-remove')
                 .on('click', this.removeNote.bind(this));
+            $element.find('.sn-editor')
+                .on('click, mousedown', function (e) {
+                    e.stopPropagation();
+                })
+                .on('keyup', this.textEditListener.bind(this))
         },
 
 
@@ -87,7 +92,7 @@ window.note = window.note || {};
         },
 
         removeNote: function (event) {
-            var note = $(event.target).parents('.jquery-sticky-note');
+            var note = $(event.target).parents('.'+note.Note.NOTECLASS);
             console.log(note);
             $(note).remove();
             this.dbService.delete($(note).data('id'));
@@ -107,7 +112,7 @@ window.note = window.note || {};
         initDrag: function () {
             // this is used later in the resizing and gesture demos
             var self = this;
-            interact('.jquery-sticky-note')
+            interact('.'+note.Note.NOTECLASS)
                 .draggable({
                     onmove: self.dragMoveListener.bind(this),
                     // enable inertial throwing
@@ -194,11 +199,25 @@ window.note = window.note || {};
 
 
         themeChangeClickListener: function () {
-            var event = arguments[0], link = arguments[1], $note = $(arguments[2]);
-            console.log($note)
+            var event = arguments[0], link = arguments[1], $note = arguments[2];
+
             var currentTheme = note.Note.prototype.getHTmlClass($note[0].className, "theme-\\w+");
             $note.removeClass(currentTheme).addClass('theme-' + $(link).data('key'));
             this.dbService.update(note.Note.prototype.htmlToObject($note));
+        },
+
+        textEditListener: function (e) {
+            var event = e, self = this;
+            this.setEventDelay(function () {
+                console.log('beforeTextChange');
+                var elem = $(event.target).parents('.'+note.Note.NOTECLASS);
+                var noteObj = note.Note.prototype.htmlToObject(elem);
+
+                self.$element.trigger('beforeTextChange', noteObj, elem);
+                self.dbService.update(noteObj);
+                self.$element.trigger('afterTextChanged', noteObj, elem);
+                console.log('afterTextChanged');
+            }, 500);
         },
 
 

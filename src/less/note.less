@@ -1,4 +1,4 @@
-.jquery-sticky-note{
+.sn-box{
   height: 180px;
   width: 166px;
   position: absolute;
@@ -11,56 +11,84 @@
   resize: both;
   &.theme-blue{
     background-color: @blue;
-    .sticky-note-header{
+    .sn-header{
       background-color: darken(@blue, 10%);
+    }
+    .sn-editor{
+      background-color: @blue;
     }
   }
   &.theme-green{
     background-color: @green;
-    .sticky-note-header{
+    .sn-header{
       background-color: darken(@green, 10%);
+    }
+    .sn-editor{
+      background-color: @green;
     }
   }
   &.theme-pink{
     background-color: @pink;
-    .sticky-note-header{
+    .sn-header{
       background-color: darken(@pink, 10%);
+    }
+    .sn-editor{
+      background-color: @pink;
     }
   }
   &.theme-purple{
     background-color: @purple;
-    .sticky-note-header{
+    .sn-header{
       background-color: darken(@purple, 10%);
+    }
+    .sn-editor{
+      background-color: @purple;
     }
   }
   &.theme-white{
     background-color: @white;
-    .sticky-note-header{
+    .sn-header{
       background-color: darken(@white, 10%);
+    }
+    .sn-editor{
+      background-color: @white;
     }
   }
   &.theme-yellow{
     background-color: @yellow;
-    .sticky-note-header{
+    .sn-header{
       background-color: darken(@yellow, 10%);
     }
+    .sn-editor{
+      background-color: @yellow;
+    }
   }
-  .sticky-note-header{
+  .sn-header{
     font-size: 14px;
     padding: 5px;
     line-height: 14px;
     height: 14px;
     cursor: move;
-    .remove-note{
+    .sn-btn-add-new{
       float: right;
       text-decoration: none;
     }
-    .add-new-note{
+    .sn-btn-remove{
       text-decoration: none;
     }
   }
-  .sticky-note-body{
+  .sn-body{
     padding: 10px;
+    height: 80%;
+    .sn-editor{
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      resize: none;
+      border: 0;
+      outline: none;
+    }
   }
 
 

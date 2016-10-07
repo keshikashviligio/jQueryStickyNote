@@ -1,4 +1,4 @@
-.jquery-sticky-note {
+.sn-box {
   height: 180px;
   width: 166px;
   position: absolute;
@@ -12,58 +12,86 @@
   box-shadow: 0px 1px 7px #c7c7c7;
   resize: both;
 }
-.jquery-sticky-note.theme-blue {
+.sn-box.theme-blue {
   background-color: #BFE0F5;
 }
-.jquery-sticky-note.theme-blue .sticky-note-header {
+.sn-box.theme-blue .sn-header {
   background-color: #93cbee;
 }
-.jquery-sticky-note.theme-green {
+.sn-box.theme-blue .sn-editor {
+  background-color: #BFE0F5;
+}
+.sn-box.theme-green {
   background-color: #C2F4BD;
 }
-.jquery-sticky-note.theme-green .sticky-note-header {
+.sn-box.theme-green .sn-header {
   background-color: #9aed91;
 }
-.jquery-sticky-note.theme-pink {
+.sn-box.theme-green .sn-editor {
+  background-color: #C2F4BD;
+}
+.sn-box.theme-pink {
   background-color: #F0BFF0;
 }
-.jquery-sticky-note.theme-pink .sticky-note-header {
+.sn-box.theme-pink .sn-header {
   background-color: #e696e6;
 }
-.jquery-sticky-note.theme-purple {
+.sn-box.theme-pink .sn-editor {
+  background-color: #F0BFF0;
+}
+.sn-box.theme-purple {
   background-color: #D1C8FE;
 }
-.jquery-sticky-note.theme-purple .sticky-note-header {
+.sn-box.theme-purple .sn-header {
   background-color: #a796fd;
 }
-.jquery-sticky-note.theme-white {
+.sn-box.theme-purple .sn-editor {
+  background-color: #D1C8FE;
+}
+.sn-box.theme-white {
   background-color: #F4F4F4;
 }
-.jquery-sticky-note.theme-white .sticky-note-header {
+.sn-box.theme-white .sn-header {
   background-color: #dbdbdb;
 }
-.jquery-sticky-note.theme-yellow {
+.sn-box.theme-white .sn-editor {
+  background-color: #F4F4F4;
+}
+.sn-box.theme-yellow {
   background-color: #FDFBB6;
 }
-.jquery-sticky-note.theme-yellow .sticky-note-header {
+.sn-box.theme-yellow .sn-header {
   background-color: #fcf884;
 }
-.jquery-sticky-note .sticky-note-header {
+.sn-box.theme-yellow .sn-editor {
+  background-color: #FDFBB6;
+}
+.sn-box .sn-header {
   font-size: 14px;
   padding: 5px;
   line-height: 14px;
   height: 14px;
   cursor: move;
 }
-.jquery-sticky-note .sticky-note-header .remove-note {
+.sn-box .sn-header .sn-btn-add-new {
   float: right;
   text-decoration: none;
 }
-.jquery-sticky-note .sticky-note-header .add-new-note {
+.sn-box .sn-header .sn-btn-remove {
   text-decoration: none;
 }
-.jquery-sticky-note .sticky-note-body {
+.sn-box .sn-body {
   padding: 10px;
+  height: 80%;
+}
+.sn-box .sn-body .sn-editor {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  resize: none;
+  border: 0;
+  outline: none;
 }
 /* context menu */
 .context-menu {

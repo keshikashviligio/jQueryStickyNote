@@ -50,7 +50,7 @@ window.note = window.note || {};
     };
 
     /**
-     *
+     * @type object
      * @param updatedData
      */
     note.DbLocalStorageService.prototype.update = function (updatedData) {

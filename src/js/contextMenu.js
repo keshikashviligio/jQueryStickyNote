@@ -44,7 +44,7 @@ window.note = window.note || {};
 
     note.ContextMenu.OPTIONS = {
         itemClickCallback: function () {},
-        menuOwnerActiveClass: '.context-menu-open'
+        menuOwnerActiveClass: 'context-menu-open'
     };
 
 
@@ -150,7 +150,7 @@ window.note = window.note || {};
             if (this.menuState !== 0) {
                 this.menuState = 0;
                 this.menu.classList.remove(this.contextMenuActive);
-                $(this.option.menuOwnerActiveClass).removeClass(this.option.menuOwnerActiveClass);
+                $('.'+this.option.menuOwnerActiveClass).removeClass(this.option.menuOwnerActiveClass);
             }
         },
 
@@ -191,7 +191,7 @@ window.note = window.note || {};
          */
         menuItemListener: function (e, link) {
             if(typeof this.option.itemClickCallback == 'function'){
-                var menuOwner = $(this.option.menuOwnerActiveClass);
+                var menuOwner = $('.'+this.option.menuOwnerActiveClass);
                 this.option.itemClickCallback.call(null, e, link, menuOwner);
             }
             this.toggleMenuOff();

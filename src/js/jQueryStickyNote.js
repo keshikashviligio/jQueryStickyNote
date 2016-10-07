@@ -26,6 +26,8 @@ window.note = {};
 
         this.init();
     };
+    note.Note.NOTECLASS = 'sn-box';
+
     note.Note.prototype = {
         constructor: note.Note,
 
@@ -47,12 +49,12 @@ window.note = {};
         },
 
         getHtml: function (id, theme, width, height, x, y, text) {
-            return  '<div id="note-' + id + '" data-id="'+id+'" data-x="'+x+'" data-y="'+y+'" class="jquery-sticky-note theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;-webkit-transform: translate('+x+'px, '+y+'px);transform: translate('+x+'px, '+y+'px);">' +
-                    '<div class="sticky-note-header">' +
-                    '<a href="javascript:" class="add-new-note">+</a>' +
-                    '<a href="javascript:" class="remove-note">x</a>' +
+            return  '<div id="note-' + id + '" data-id="'+id+'" data-x="'+x+'" data-y="'+y+'" class="'+note.Note.NOTECLASS+' theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;-webkit-transform: translate('+x+'px, '+y+'px);transform: translate('+x+'px, '+y+'px);">' +
+                    '<div class="sn-header">' +
+                    '<a href="javascript:" class="sn-btn-add-new">+</a>' +
+                    '<a href="javascript:" class="sn-btn-remove">x</a>' +
                     '</div>' +
-                    '<div class="sticky-note-body">' + text + '</div>' +
+                    '<div class="sn-body"><textarea class="sn-editor">' + text + '</textarea></div>' +
                     '</div>';
         },
         
@@ -66,7 +68,7 @@ window.note = {};
                 height: html.height(),
                 x: html.attr('data-x'),
                 y: html.attr('data-y'),
-                text: html.find('.sticky-note-body').text(),
+                text: html.find('.sn-editor').val(),
                 theme: theme
             }
         },
@@ -187,7 +189,7 @@ window.note = window.note || {};
     };
 
     /**
-     *
+     * @type object
      * @param updatedData
      */
     note.DbLocalStorageService.prototype.update = function (updatedData) {
@@ -380,7 +382,7 @@ window.note = window.note || {};
 
     note.ContextMenu.OPTIONS = {
         itemClickCallback: function () {},
-        menuOwnerActiveClass: '.context-menu-open'
+        menuOwnerActiveClass: 'context-menu-open'
     };
 
 
@@ -486,7 +488,7 @@ window.note = window.note || {};
             if (this.menuState !== 0) {
                 this.menuState = 0;
                 this.menu.classList.remove(this.contextMenuActive);
-                $(this.option.menuOwnerActiveClass).removeClass(this.option.menuOwnerActiveClass);
+                $('.'+this.option.menuOwnerActiveClass).removeClass(this.option.menuOwnerActiveClass);
             }
         },
 
@@ -527,7 +529,7 @@ window.note = window.note || {};
          */
         menuItemListener: function (e, link) {
             if(typeof this.option.itemClickCallback == 'function'){
-                var menuOwner = $(this.option.menuOwnerActiveClass);
+                var menuOwner = $('.'+this.option.menuOwnerActiveClass);
                 this.option.itemClickCallback.call(null, e, link, menuOwner);
             }
             this.toggleMenuOff();
@@ -657,23 +659,28 @@ window.note = window.note || {};
                 itemClickCallback: self.themeChangeClickListener.bind(this)
             });
 
-            this.$element.on('sn-afterMove', function (element, data) {
-                console.log('on-sn-afterMove');
-                console.log(element, data);
-            })
-            this.$element.on('sn-afterResize', function (element, data) {
-                console.log('on-sn-afterResize');
-                console.log(element, data);
-            })
+            // this.$element.on('sn-afterMove', function (element, data) {
+            //     console.log('on-sn-afterMove');
+            //     console.log(element, data);
+            // })
+            // this.$element.on('sn-afterResize', function (element, data) {
+            //     console.log('on-sn-afterResize');
+            //     console.log(element, data);
+            // })
 
         },
 
 
         bindEvents: function ($element) {
-            $element.find('.add-new-note')
+            $element.find('.sn-btn-add-new')
                 .on('click', this.openNewNote.bind(this));
-            $element.find('.remove-note')
+            $element.find('.sn-btn-remove')
                 .on('click', this.removeNote.bind(this));
+            $element.find('.sn-editor')
+                .on('click, mousedown', function (e) {
+                    e.stopPropagation();
+                })
+                .on('keyup', this.textEditListener.bind(this))
         },
 
 
@@ -696,7 +703,7 @@ window.note = window.note || {};
         },
 
         removeNote: function (event) {
-            var note = $(event.target).parents('.jquery-sticky-note');
+            var note = $(event.target).parents('.'+note.Note.NOTECLASS);
             console.log(note);
             $(note).remove();
             this.dbService.delete($(note).data('id'));
@@ -716,7 +723,7 @@ window.note = window.note || {};
         initDrag: function () {
             // this is used later in the resizing and gesture demos
             var self = this;
-            interact('.jquery-sticky-note')
+            interact('.'+note.Note.NOTECLASS)
                 .draggable({
                     onmove: self.dragMoveListener.bind(this),
                     // enable inertial throwing
@@ -803,11 +810,25 @@ window.note = window.note || {};
 
 
         themeChangeClickListener: function () {
-            var event = arguments[0], link = arguments[1], $note = $(arguments[2]);
-            console.log($note)
+            var event = arguments[0], link = arguments[1], $note = arguments[2];
+
             var currentTheme = note.Note.prototype.getHTmlClass($note[0].className, "theme-\\w+");
             $note.removeClass(currentTheme).addClass('theme-' + $(link).data('key'));
             this.dbService.update(note.Note.prototype.htmlToObject($note));
+        },
+
+        textEditListener: function (e) {
+            var event = e, self = this;
+            this.setEventDelay(function () {
+                console.log('beforeTextChange');
+                var elem = $(event.target).parents('.'+note.Note.NOTECLASS);
+                var noteObj = note.Note.prototype.htmlToObject(elem);
+
+                self.$element.trigger('beforeTextChange', noteObj, elem);
+                self.dbService.update(noteObj);
+                self.$element.trigger('afterTextChanged', noteObj, elem);
+                console.log('afterTextChanged');
+            }, 500);
         },
 
 
