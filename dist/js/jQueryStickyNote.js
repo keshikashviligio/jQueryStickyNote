@@ -356,7 +356,7 @@ window.note = window.note || {};
         this.contextMenuLinkClassName = "context-menu__link";
         this.contextMenuActive = "context-menu--active";
 
-        this.taskItemClassName = "jquery-sticky-note";
+        this.taskItemClassName = "sn-box";
         this.taskItemInContext = "";
 
         this.clickCoords = 0;
@@ -703,10 +703,9 @@ window.note = window.note || {};
         },
 
         removeNote: function (event) {
-            var note = $(event.target).parents('.'+note.Note.NOTECLASS);
-            console.log(note);
-            $(note).remove();
-            this.dbService.delete($(note).data('id'));
+            var noteNode = $(event.target).parents('.'+note.Note.NOTECLASS);
+            $(noteNode).remove();
+            this.dbService.delete($(noteNode).data('id'));
         },
 
 

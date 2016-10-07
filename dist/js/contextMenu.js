@@ -18,7 +18,7 @@ window.note = window.note || {};
         this.contextMenuLinkClassName = "context-menu__link";
         this.contextMenuActive = "context-menu--active";
 
-        this.taskItemClassName = "jquery-sticky-note";
+        this.taskItemClassName = "sn-box";
         this.taskItemInContext = "";
 
         this.clickCoords = 0;

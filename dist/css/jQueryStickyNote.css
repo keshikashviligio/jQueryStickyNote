@@ -73,11 +73,11 @@
   height: 14px;
   cursor: move;
 }
-.sn-box .sn-header .sn-btn-add-new {
+.sn-box .sn-header .sn-btn-remove {
   float: right;
   text-decoration: none;
 }
-.sn-box .sn-header .sn-btn-remove {
+.sn-box .sn-header .sn-btn-add-new {
   text-decoration: none;
 }
 .sn-box .sn-body {
