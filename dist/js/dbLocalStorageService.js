@@ -3,7 +3,7 @@
  *
  * ========================================================================
  * Copyright 2016
- * Licensed under MIT (https://github.com/keshikashvili-gio/jQueryStickyNote/master/LICENSE)
+ * Licensed under MIT (https://github.com/keshikashviligio/jQueryStickyNote/master/LICENSE)
  * ======================================================================== */
 window.note = window.note || {};
 +function ($) {
