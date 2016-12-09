@@ -26,6 +26,8 @@ window.note = {};
 
         this.init();
     };
+    note.Note.NOTECLASS = 'sn-box';
+
     note.Note.prototype = {
         constructor: note.Note,
 
@@ -47,13 +49,33 @@ window.note = {};
         },
 
         getHtml: function (id, theme, width, height, x, y, text) {
-            return  '<div id="note-' + id + '" class="jquery-sticky-note theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;left:' + x + 'px;top:' + y + 'px;">' +
-                    '<div class="sticky-note-header">' +
-                    '<a href="javascript:" class="add-new-note">+</a>' +
-                    '<a href="javascript:" class="remove-note">x</a>' +
+            return  '<div id="note-' + id + '" data-id="'+id+'" data-x="'+x+'" data-y="'+y+'" class="'+note.Note.NOTECLASS+' theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;-webkit-transform: translate('+x+'px, '+y+'px);transform: translate('+x+'px, '+y+'px);">' +
+                    '<div class="sn-header">' +
+                    '<a href="javascript:" class="sn-btn-add-new">+</a>' +
+                    '<a href="javascript:" class="sn-btn-remove">x</a>' +
                     '</div>' +
-                    '<div class="sticky-note-body">' + text + '</div>' +
+                    '<div class="sn-body"><textarea class="sn-editor">' + text + '</textarea></div>' +
                     '</div>';
+        },
+        
+        htmlToObject: function (html) {
+            html = $(html);
+            var theme = this.getHTmlClass(html[0].className, "theme-\\w+");
+                theme = theme.substr(theme.indexOf('-')+1);
+            return {
+                id: html.data('id'),
+                width: html.width(),
+                height: html.height(),
+                x: html.attr('data-x'),
+                y: html.attr('data-y'),
+                text: html.find('.sn-editor').val(),
+                theme: theme
+            }
+        },
+        getHTmlClass : function(str, klass) {
+            var r = new RegExp("(?:^| )(" + klass + ")(?: |$)")
+                , m = (""+str).match(r);
+            return (m) ? m[1] : null;
         }
     }
 

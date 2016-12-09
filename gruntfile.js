@@ -31,7 +31,7 @@ module.exports = function(grunt){
                     'src/js/abstractDbService.js',
                     'src/js/dbLocalStorageService.js',
                     'src/js/dbBackendService.js',
-                    'src/js/draggable.js',
+                    'src/js/contextMenu.js',
                     'src/js/noteManager.js'],
                 dest: 'src/js/<%= pkg.name %>.js'
             }

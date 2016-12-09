@@ -15,6 +15,8 @@ window.note = window.note || {};
         this.notes = {};
         this.dbService = {};
         this.maxId = 1;
+        this.eventDelaytimer = 0;
+        this.eventDelaytimerMs = 300;
         this.init();
     };
     note.NoteManager.prototype = {
@@ -42,14 +44,32 @@ window.note = window.note || {};
                 self.createNote(item);
             });
 
+            var menu = new note.ContextMenu(note.NoteManager.THEMES, {
+                itemClickCallback: self.themeChangeClickListener.bind(this)
+            });
+
+            // this.$element.on('sn-afterMove', function (element, data) {
+            //     console.log('on-sn-afterMove');
+            //     console.log(element, data);
+            // })
+            // this.$element.on('sn-afterResize', function (element, data) {
+            //     console.log('on-sn-afterResize');
+            //     console.log(element, data);
+            // })
+
         },
 
 
         bindEvents: function ($element) {
-            $element.find('.add-new-note')
-                    .on('click', this.openNewNote.bind(this));
-            $element.find('.remove-note')
-                    .on('click', this.removeNote.bind(this))
+            $element.find('.sn-btn-add-new')
+                .on('click', this.openNewNote.bind(this));
+            $element.find('.sn-btn-remove')
+                .on('click', this.removeNote.bind(this));
+            $element.find('.sn-editor')
+                .on('click, mousedown', function (e) {
+                    e.stopPropagation();
+                })
+                .on('keyup', this.textEditListener.bind(this))
         },
 
 
@@ -58,7 +78,7 @@ window.note = window.note || {};
             this.dbService.save(this.options.plainNoteObject[0]);
         },
 
-        
+
         createNote: function (object) {
             var Note = new note.Note(this.$element, object);
             this.bindEvents(Note.$note);
@@ -67,11 +87,14 @@ window.note = window.note || {};
         },
 
 
-        removeNote: function(event){
-            var note = $(event.target).parents('.jquery-sticky-note');
-            console.log(note);
-            $(note).remove();
-            this.dbService.delete(note);
+        updateNote: function (updatedData) {
+            this.dbService.update(updatedData);
+        },
+
+        removeNote: function (event) {
+            var noteNode = $(event.target).parents('.'+note.Note.NOTECLASS);
+            $(noteNode).remove();
+            this.dbService.delete($(noteNode).data('id'));
         },
 
 
@@ -88,7 +111,7 @@ window.note = window.note || {};
         initDrag: function () {
             // this is used later in the resizing and gesture demos
             var self = this;
-            interact('.jquery-sticky-note')
+            interact('.'+note.Note.NOTECLASS)
                 .draggable({
                     onmove: self.dragMoveListener.bind(this),
                     // enable inertial throwing
@@ -97,7 +120,7 @@ window.note = window.note || {};
                     restrict: {
                         restriction: "parent",
                         endOnly: true,
-                        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+                        elementRect: {top: 0, left: 0, bottom: 1, right: 1}
                     },
                     // enable autoScroll
                     autoScroll: true,
@@ -108,38 +131,49 @@ window.note = window.note || {};
                         textEl && (textEl.textContent =
                             'moved a distance of '
                             + (Math.sqrt(event.dx * event.dx +
-                                event.dy * event.dy)|0) + 'px');
+                                event.dy * event.dy) | 0) + 'px');
                     }
                 })
                 .resizable({
-                    preserveAspectRatio: true,
+                    //preserveAspectRatio: true,
                     edges: {left: true, right: true, bottom: true, top: true}
                 })
                 .on('resizemove', self.resizeListener.bind(this));
         },
         dragMoveListener: function (event) {
-            console.log('beforeMove');
+
+            var self = this;
             var target = event.target,
-            // keep the dragged position in the data-x/data-y attributes
+                // keep the dragged position in the data-x/data-y attributes
                 x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
                 y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
+            console.log('sn-beforeMove');
+            self.$element.trigger('sn-beforeMove', target, event);
             // translate the element
-            target.style.webkitTransform =
-                target.style.transform =
-                    'translate(' + x + 'px, ' + y + 'px)';
+            target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
 
             // update the posiion attributes
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
-            console.log('afterMove');
+
+            //save updated data
+            this.setEventDelay(function () {
+                console.log('sn-afterMove');
+                var data = note.Note.prototype.htmlToObject(target);
+                self.$element.trigger('sn-afterMove', target, data);
+                self.updateNote(data);
+            }, this.eventDelaytimerMs);
+
         },
         resizeListener: function (event) {
-            console.log('beforeResize');
+            var self = this;
             var target = event.target,
                 x = (parseFloat(target.getAttribute('data-x')) || 0),
                 y = (parseFloat(target.getAttribute('data-y')) || 0);
 
+            console.log('sn-beforeResize');
+            self.$element.trigger('sn-beforeResize', target, event);
             // update the element's style
             target.style.width = event.rect.width + 'px';
             target.style.height = event.rect.height + 'px';
@@ -153,18 +187,53 @@ window.note = window.note || {};
 
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
-            console.log('afterResize');
+            this.setEventDelay(function () {
+                console.log('sn-afterResize');
+                var data = note.Note.prototype.htmlToObject(target);
+                self.$element.trigger('sn-afterResize', target, data);
+                self.updateNote(data);
+            }, this.eventDelaytimerMs);
+
+        },
+
+
+        themeChangeClickListener: function () {
+            var event = arguments[0], link = arguments[1], $note = arguments[2];
+
+            var currentTheme = note.Note.prototype.getHTmlClass($note[0].className, "theme-\\w+");
+            $note.removeClass(currentTheme).addClass('theme-' + $(link).data('key'));
+            this.dbService.update(note.Note.prototype.htmlToObject($note));
+        },
+
+        textEditListener: function (e) {
+            var event = e, self = this;
+            this.setEventDelay(function () {
+                console.log('beforeTextChange');
+                var elem = $(event.target).parents('.'+note.Note.NOTECLASS);
+                var noteObj = note.Note.prototype.htmlToObject(elem);
+
+                self.$element.trigger('beforeTextChange', noteObj, elem);
+                self.dbService.update(noteObj);
+                self.$element.trigger('afterTextChanged', noteObj, elem);
+                console.log('afterTextChanged');
+            }, 500);
+        },
+
+
+        setEventDelay: function (callback, ms) {
+            clearTimeout(this.eventDelaytimer);
+            this.eventDelaytimer = setTimeout(callback, ms);
         }
     };
 
 
     note.NoteManager.THEMES = [
-        'blue',
-        'green',
-        'pink',
-        'purple',
-        'white',
-        'yellow'
+        {name: 'blue', value: '#BFE0F5'},
+        {name: 'green', value: '#C2F4BD'},
+        {name: 'pink', value: '#F0BFF0'},
+        {name: 'purple', value: '#D1C8FE'},
+        {name: 'white', value: '#F4F4F4'},
+        {name: 'yellow', value: '#FDFBB6'}
     ];
 
 

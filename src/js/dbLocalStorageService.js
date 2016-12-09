@@ -36,9 +36,12 @@ window.note = window.note || {};
         var data = this._getAllFromLocalStorage();
         for (var i = 0; i < data.length; i++) {
             if (data[i].id == id) {
-                data.splice(data[i], 1);
+                data.splice(i, 1);
+                // console.log('if');
             }
         }
+        // console.log(data);
+        // console.log(id);
         this._saveToLocalStorage(data);
     };
 
@@ -47,7 +50,7 @@ window.note = window.note || {};
     };
 
     /**
-     *
+     * @type object
      * @param updatedData
      */
     note.DbLocalStorageService.prototype.update = function (updatedData) {
@@ -57,6 +60,7 @@ window.note = window.note || {};
                 data[i] = updatedData;
             }
         }
+        console.log(updatedData);
         this._saveToLocalStorage(data);
     };
 
