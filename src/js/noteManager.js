@@ -175,12 +175,28 @@ window.note = window.note || {};
             console.log('sn-beforeResize');
             self.$element.trigger('sn-beforeResize', target, event);
             // update the element's style
-            target.style.width = event.rect.width + 'px';
-            target.style.height = event.rect.height + 'px';
+            var w = event.rect.width, h = event.rect.height;
+            if(w > self.options.noteOptions.maxWidth){
+                w = self.options.noteOptions.maxWidth;
+            }
+            if(w < self.options.noteOptions.minWidth){
+                w = self.options.noteOptions.minWidth;
+            }
+            if(h > self.options.noteOptions.maxHeight){
+                h = self.options.noteOptions.maxHeight;
+            }
+            if(h < self.options.noteOptions.minHeight){
+                h = self.options.noteOptions.minHeight;
+            }
+            console.log(w, h, self.options.noteOptions.minHeight);
+            target.style.width = w + 'px';
+            target.style.height = h + 'px';
 
             // translate when resizing from top or left edges
             x += event.deltaRect.left;
             y += event.deltaRect.top;
+
+
 
             target.style.webkitTransform = target.style.transform =
                 'translate(' + x + 'px,' + y + 'px)';
@@ -247,6 +263,12 @@ window.note = window.note || {};
             text: "",
             theme: 'yellow'
         }],
+        noteOptions: {
+            maxWidth: 200,
+            maxHeight: 200,
+            minWidth: 30,
+            minHeight: 30
+        },
         dbService: 'dbLocalStorageService', // to server store 'dbBackendService'
         dbLocalStorageOptions: {
             localStorageKey: '_jq_sticky_note'
