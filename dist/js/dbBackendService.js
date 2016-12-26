@@ -11,6 +11,7 @@ window.note = window.note || {};
 
     note.DbBackendService = function (options) {
         this.options = options;
+        console.log(options);
         this.data = {};
     };
 
@@ -20,7 +21,7 @@ window.note = window.note || {};
 
     note.DbBackendService.prototype.save = function (data) {
         var self = this;
-         this._post(this.options.postUrl, data).done(function(res){
+         this._post(this.options.saveUrl, data).done(function(res){
              if(res.success){
                  self.data = res.data;
              }else{

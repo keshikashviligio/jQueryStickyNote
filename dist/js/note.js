@@ -68,6 +68,7 @@ window.note = {};
                 x: html.attr('data-x'),
                 y: html.attr('data-y'),
                 text: html.find('.sn-editor').val(),
+                title: "title",
                 theme: theme
             }
         },

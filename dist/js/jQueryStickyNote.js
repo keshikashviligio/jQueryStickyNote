@@ -68,6 +68,7 @@ window.note = {};
                 x: html.attr('data-x'),
                 y: html.attr('data-y'),
                 text: html.find('.sn-editor').val(),
+                title: "title",
                 theme: theme
             }
         },
@@ -281,6 +282,7 @@ window.note = window.note || {};
 
     note.DbBackendService = function (options) {
         this.options = options;
+        console.log(options);
         this.data = {};
     };
 
@@ -290,7 +292,7 @@ window.note = window.note || {};
 
     note.DbBackendService.prototype.save = function (data) {
         var self = this;
-         this._post(this.options.postUrl, data).done(function(res){
+         this._post(this.options.saveUrl, data).done(function(res){
              if(res.success){
                  self.data = res.data;
              }else{
@@ -651,10 +653,10 @@ window.note = window.note || {};
       var self = this, savedData;
 
       self.options = $.extend({}, note.NoteManager.DEFAULTS, self.options);
-      if (self.options.dbService === 'dbLocalStorageService') {
-        self.dbService = new note.DbLocalStorageService(self.options.dbLocalStorageOptions);
-      } else if (self.options.dbService === 'dbBackendService') {
-        self.dbService = new note.DbBackendService(self.options.dbBackendOptions);
+      if (self.options.dbService === 'localStorageService') {
+        self.dbService = new note.DbLocalStorageService(self.options.dbServices.localStorageService.localStorageServiceOptions);
+      } else if (self.options.dbService === 'backendService') {
+        self.dbService = new note.DbBackendService(self.options.dbServices.backendService.backendServiceOptions);
       }
       savedData = self.dbService.getData();
       if (savedData.length) {
@@ -879,6 +881,7 @@ window.note = window.note || {};
       x: 300,
       y: 100,
       text: "",
+      title: "",
       theme: 'yellow'
     }],
     noteOptions: {
@@ -888,17 +891,23 @@ window.note = window.note || {};
       minHeight: 30,
       buttons: ['<a href="javascript:" class="sn-btn-add-new">+</a>', '<a href="javascript:" class="sn-btn-remove">x</a>']
     },
-    dbService: 'dbLocalStorageService', // to server store 'dbBackendService'
-    dbLocalStorageOptions: {
-      localStorageKey: '_jq_sticky_note'
+    dbServices: {
+      localStorageService: {
+        localStorageServiceOptions: {
+          localStorageKey: '_jq_sticky_note'
+        }
+      },
+      backendService: {
+        backendServiceOptions: {
+          loadUrl: '',
+          saveUrl: '',
+          updateUrl: '',
+          deleteUrl: '',
+          deleteAllUrl: ''
+        }
+      }
     },
-    dbBackendOptions: {
-      loadUrl: '',
-      saveUrl: '',
-      updateUrl: '',
-      deleteUrl: '',
-      deleteAllUrl: ''
-    }
+    dbService: 'localStorageService'
   };
 
 
