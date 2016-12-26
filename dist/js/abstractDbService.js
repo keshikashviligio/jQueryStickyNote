@@ -49,6 +49,9 @@ window.note = window.note || {};
         /**
          *
          */
-        getData: function(){console.error('GETDATA method must be implemented in your DbService class')}
+        getData: function(){console.error('GETDATA method must be implemented in your DbService class')},
+
+
+        lastInsertId: function(){console.error('lastInsertId method must be implemented in your DbService class')}
     }
 }(jQuery);

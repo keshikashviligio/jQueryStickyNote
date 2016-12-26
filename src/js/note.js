@@ -50,9 +50,8 @@ window.note = {};
 
         getHtml: function (id, theme, width, height, x, y, text) {
             return  '<div id="note-' + id + '" data-id="'+id+'" data-x="'+x+'" data-y="'+y+'" class="'+note.Note.NOTECLASS+' theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;-webkit-transform: translate('+x+'px, '+y+'px);transform: translate('+x+'px, '+y+'px);">' +
-                    '<div class="sn-header">' +
-                    '<a href="javascript:" class="sn-btn-add-new">+</a>' +
-                    '<a href="javascript:" class="sn-btn-remove">x</a>' +
+                    '<div class="sn-header">' + note.NoteManager.DEFAULTS.noteOptions.buttons[0]+
+              note.NoteManager.DEFAULTS.noteOptions.buttons[1] +
                     '</div>' +
                     '<div class="sn-body"><textarea class="sn-editor">' + text + '</textarea></div>' +
                     '</div>';

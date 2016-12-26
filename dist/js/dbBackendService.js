@@ -55,6 +55,11 @@ window.note = window.note || {};
         return self.data;
     };
 
+    note.DbBackendService.prototype.lastInsertId = function () {
+
+        return this._getMaxId();
+    };
+
     note.DbBackendService.prototype._get = function (url, data) {
         return $.ajax({
             url: url,

@@ -78,6 +78,13 @@ window.note = window.note || {};
 
     /**
      *
+     */
+    note.DbLocalStorageService.prototype.lastInsertId = function () {
+        return this._getMaxId();
+    };
+
+    /**
+     *
      * @returns {Array|object}
      * @private
      */
