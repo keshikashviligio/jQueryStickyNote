@@ -9,23 +9,17 @@ $conn = new mysqli('localhost', 'root', '', 'jqstickynote');
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-$width = $_POST['width'];
-$height = $_POST['height'];
-$x = $_POST['x'];
-$y = $_POST['y'];
-$text = $_POST['text'];
-$title = $_POST['title'];
-$theme = $_POST['theme'];
+$id = $_POST['id'];
 $user = 1;
 
-$sql = "INSERT INTO note (width, height, x, y, title, text, theme, user_id) VALUES ('".$width."', '".$height."', '".$x."', '".$y."', '".$title."', '".$text."', '".$theme."', '".$user."')";
+$sql = "DELETE FROM note WHERE id=$id";
 
 //echo $sql;
 $result = $conn->query($sql);
 
 $returnArr = [
     'success' => $result,
-    'id' => $conn->insert_id,
+    'id' => $id,
 ];
 
 $conn->close();

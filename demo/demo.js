@@ -9,8 +9,8 @@ $(document).ready(function () {
         backendServiceOptions: {
           loadUrl: 'data.php',
           saveUrl: 'save.php',
-          updateUrl: '',
-          deleteUrl: '',
+          updateUrl: 'update.php',
+          deleteUrl: 'delete.php',
           deleteAllUrl: ''
         }
       }

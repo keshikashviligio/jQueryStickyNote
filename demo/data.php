@@ -23,4 +23,4 @@ if ($result->num_rows > 0) {
 
 $conn->close();
 
-return json_encode($returnArr, true);
+echo json_encode($returnArr, true);

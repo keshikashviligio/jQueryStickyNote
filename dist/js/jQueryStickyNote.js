@@ -278,75 +278,86 @@ window.note = window.note || {};
  * ======================================================================== */
 window.note = window.note || {};
 +function ($) {
-    'use strict';
+  'use strict';
 
-    note.DbBackendService = function (options) {
-        this.options = options;
-        console.log(options);
-        this.data = {};
-    };
+  note.DbBackendService = function (options) {
+    this.options = options;
+    console.log(options);
+    this.data = {};
+  };
 
-    note.DbBackendService.prototype = Object.create(note.DbService.prototype);
+  note.DbBackendService.prototype = Object.create(note.DbService.prototype);
 
-    note.DbBackendService.prototype.constructor = note.DbBackendService;
+  note.DbBackendService.prototype.constructor = note.DbBackendService;
 
-    note.DbBackendService.prototype.save = function (data) {
-        var self = this;
-         this._post(this.options.saveUrl, data).done(function(res){
-             if(res.success){
-                 self.data = res.data;
-             }else{
-                 return res.errorMsg;
-             }
-         });
+  note.DbBackendService.prototype.save = function (data) {
+    var self = this;
+    this._post(this.options.saveUrl, data).done(function (res) {
+      if (res.success) {
+        self.data = res.data;
+      } else {
+        return res.errorMsg;
+      }
+    });
+  };
 
-        return self.data;
-    };
+  note.DbBackendService.prototype.delete = function (id) {
+    var self = this;
+    this._post(self.options.deleteUrl, {id: id}).done(function (res) {
+      if (res.success) {
+        self.data = res.data;
+      } else {
+        console.log(res.errorMsg);
+      }
+    });
+  };
 
-    note.DbBackendService.prototype.delete = function () {
+  note.DbBackendService.prototype.deleteAll = function () {
 
-    };
+  };
 
-    note.DbBackendService.prototype.deleteAll = function () {
+  note.DbBackendService.prototype.update = function (data) {
+    var self = this;
+    this._post(self.options.updateUrl, data).done(function (res) {
+      if (res.success) {
+        self.data = res.data;
+      } else {
+        console.log(res.errorMsg);
+      }
+    });
+  };
 
-    };
+  note.DbBackendService.prototype.updateAll = function () {
 
-    note.DbBackendService.prototype.update = function () {
 
-    };
+  };
 
-    note.DbBackendService.prototype.updateAll = function () {
+  note.DbBackendService.prototype.getData = function () {
+    var self = this;
+    return this._get(this.options.loadUrl);
+  };
 
-    };
+  note.DbBackendService.prototype.lastInsertId = function () {
+    return this.data.id;
+  };
 
-    note.DbBackendService.prototype.getData = function () {
-        var self = this;
-        this._get(this.options.loadUrl).done(function(data){
-            self.data = data;
-        });
-        return self.data;
-    };
+  note.DbBackendService.prototype._get = function (url, data) {
+    return $.ajax({
+      url: url,
+      type: 'GET',
+      data: data,
+      dataType: 'json'
+    });
+  };
 
-    note.DbBackendService.prototype.lastInsertId = function () {
-
-        return this._getMaxId();
-    };
-
-    note.DbBackendService.prototype._get = function (url, data) {
-        return $.ajax({
-            url: url,
-            type: 'GET',
-            data: data
-        });
-    };
-
-    note.DbBackendService.prototype._post = function (url, data) {
-        return $.ajax({
-            url: url,
-            type: 'POST',
-            data: data
-        });
-    };
+  note.DbBackendService.prototype._post = function (url, data) {
+    return $.ajax({
+      url: url,
+      type: 'POST',
+      data: data,
+      dataType: 'json'
+    });
+  };
 
 
 }(jQuery);
@@ -658,21 +669,26 @@ window.note = window.note || {};
       } else if (self.options.dbService === 'backendService') {
         self.dbService = new note.DbBackendService(self.options.dbServices.backendService.backendServiceOptions);
       }
-      savedData = self.dbService.getData();
-      if (savedData.length) {
-        self.notes = savedData;
-      } else {
-        self.notes = self.options.plainNoteObject;
-        self.dbService.save(self.notes[0]);
-      }
+      $.when(self.dbService.getData()).done(function (data) {
+        console.log(data);
+        if (data.length) {
+          self.notes = data;
+        } else {
+          self.notes = self.options.plainNoteObject;
+          self.dbService.save(self.notes[0]);
+        }
 
-      $.each(self.notes, function (i, item) {
-        self.createNote(item);
+        $.each(self.notes, function (i, item) {
+          self.createNote(item);
+        });
+
+        var menu = new note.ContextMenu(note.NoteManager.THEMES, {
+          itemClickCallback: self.themeChangeClickListener.bind(this)
+        });
       });
 
-      var menu = new note.ContextMenu(note.NoteManager.THEMES, {
-        itemClickCallback: self.themeChangeClickListener.bind(this)
-      });
+
+
 
       // this.$element.on('sn-afterMove', function (element, data) {
       //     console.log('on-sn-afterMove');

@@ -31,21 +31,26 @@ window.note = window.note || {};
       } else if (self.options.dbService === 'backendService') {
         self.dbService = new note.DbBackendService(self.options.dbServices.backendService.backendServiceOptions);
       }
-      savedData = self.dbService.getData();
-      if (savedData.length) {
-        self.notes = savedData;
-      } else {
-        self.notes = self.options.plainNoteObject;
-        self.dbService.save(self.notes[0]);
-      }
+      $.when(self.dbService.getData()).done(function (data) {
+        console.log(data);
+        if (data.length) {
+          self.notes = data;
+        } else {
+          self.notes = self.options.plainNoteObject;
+          self.dbService.save(self.notes[0]);
+        }
 
-      $.each(self.notes, function (i, item) {
-        self.createNote(item);
+        $.each(self.notes, function (i, item) {
+          self.createNote(item);
+        });
+
+        var menu = new note.ContextMenu(note.NoteManager.THEMES, {
+          itemClickCallback: self.themeChangeClickListener.bind(this)
+        });
       });
 
-      var menu = new note.ContextMenu(note.NoteManager.THEMES, {
-        itemClickCallback: self.themeChangeClickListener.bind(this)
-      });
+
+
 
       // this.$element.on('sn-afterMove', function (element, data) {
       //     console.log('on-sn-afterMove');
