@@ -2,6 +2,9 @@
  * Created by koco on 08.09.2016.
  */
 $(document).ready(function () {
+
+  note.NoteManager.THEMES = $.extend(note.NoteManager.THEMES, [{name: 'custom', value: '#878787'}]);
+
   $('.notes').jQueryStickyNote({
     dbService: 'backendService',
     dbServices: {

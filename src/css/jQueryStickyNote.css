@@ -66,19 +66,36 @@
 .sn-box.theme-yellow .sn-editor {
   background-color: #FDFBB6;
 }
+.sn-box.theme-custom {
+  background-color: #878787;
+}
+.sn-box.theme-custom .sn-header {
+  background-color: #6e6e6e;
+}
+.sn-box.theme-custom .sn-editor {
+  background-color: #878787;
+}
 .sn-box .sn-header {
   font-size: 14px;
   padding: 5px;
   line-height: 14px;
   height: 14px;
   cursor: move;
+  text-align: center;
 }
 .sn-box .sn-header .sn-btn-remove {
   float: right;
   text-decoration: none;
+  width: 10%;
 }
 .sn-box .sn-header .sn-btn-add-new {
+  float: left;
   text-decoration: none;
+  width: 10%;
+}
+.sn-box .sn-header .sn-title {
+  display: inline-block;
+  width: 80%;
 }
 .sn-box .sn-body {
   padding: 10px;

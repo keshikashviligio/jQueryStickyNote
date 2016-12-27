@@ -23,30 +23,32 @@ window.note = window.note || {};
 
     init: function () {
       console.log('init');
-      var self = this, savedData;
+      var self = this;
 
       self.options = $.extend({}, note.NoteManager.DEFAULTS, self.options);
+
       if (self.options.dbService === 'localStorageService') {
         self.dbService = new note.DbLocalStorageService(self.options.dbServices.localStorageService.localStorageServiceOptions);
       } else if (self.options.dbService === 'backendService') {
         self.dbService = new note.DbBackendService(self.options.dbServices.backendService.backendServiceOptions);
       }
       $.when(self.dbService.getData()).done(function (data) {
-        console.log(data);
-        if (data.length) {
-          self.notes = data;
-        } else {
-          self.notes = self.options.plainNoteObject;
-          self.dbService.save(self.notes[0]);
-        }
+          // console.log(data, 'dataaa');
+          if (data.length) {
+            self.notes = data;
+          } else {
+            self.notes = self.options.plainNoteObject;
+            self.dbService.save(self.notes[0]);
+          }
 
-        $.each(self.notes, function (i, item) {
-          self.createNote(item);
-        });
+          $.each(self.notes, function (i, item) {
+            self.createNote(item);
+          });
 
-        var menu = new note.ContextMenu(note.NoteManager.THEMES, {
-          itemClickCallback: self.themeChangeClickListener.bind(this)
-        });
+          // console.log(note.NoteManager.THEMES);
+          var menu = new note.ContextMenu(note.NoteManager.THEMES, {
+            itemClickCallback: self.themeChangeClickListener.bind(self)
+          });
       });
 
 
@@ -66,21 +68,28 @@ window.note = window.note || {};
 
     bindEvents: function ($element) {
       $element.find('.sn-btn-add-new')
+        .off('click')
         .on('click', this.openNewNote.bind(this));
       $element.find('.sn-btn-remove')
+        .off('click')
         .on('click', this.removeNote.bind(this));
       $element.find('.sn-editor')
+        .off('click')
         .on('click, mousedown', function (e) {
           e.stopPropagation();
         })
+        .off('keyup')
         .on('keyup', this.textEditListener.bind(this))
     },
 
 
     openNewNote: function () {
-      this.dbService.save(this.options.plainNoteObject[0]);
-      this.options.plainNoteObject[0].id = this.dbService.lastInsertId();
-      this.createNote(this.options.plainNoteObject[0]);
+      //console.log('new note');
+      var self = this;
+      $.when(this.dbService.save(this.options.plainNoteObject[0])).done(function (data) {
+        self.options.plainNoteObject[0].id = self.dbService.lastInsertId();
+        self.createNote(self.options.plainNoteObject[0]);
+      });
     },
 
 
@@ -187,7 +196,7 @@ window.note = window.note || {};
       if (h < self.options.noteOptions.minHeight) {
         h = self.options.noteOptions.minHeight;
       }
-      console.log(w, h, self.options.noteOptions.minHeight);
+      // console.log(w, h, self.options.noteOptions.minHeight);
       target.style.width = w + 'px';
       target.style.height = h + 'px';
 

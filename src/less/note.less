@@ -62,6 +62,14 @@
     .sn-editor{
       background-color: @yellow;
     }
+  }&.theme-custom{
+    background-color: #878787;
+    .sn-header{
+      background-color: darken(#878787, 10%);
+    }
+    .sn-editor{
+      background-color: #878787;
+    }
   }
   .sn-header{
     font-size: 14px;
@@ -69,12 +77,20 @@
     line-height: 14px;
     height: 14px;
     cursor: move;
+    text-align: center;
     .sn-btn-remove{
       float: right;
       text-decoration: none;
+      width: 10%;
     }
     .sn-btn-add-new{
+      float: left;
       text-decoration: none;
+      width: 10%;
+    }
+    .sn-title{
+      display: inline-block;
+      width: 80%;
     }
   }
   .sn-body{

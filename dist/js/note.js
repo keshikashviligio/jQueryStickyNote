@@ -21,6 +21,7 @@ window.note = {};
         this.y = data.y;
         this.theme = data.theme;
         this.text = data.text;
+        this.title = data.title;
 
         this.$note = null;
 
@@ -36,7 +37,7 @@ window.note = {};
         },
 
         createNote: function () {
-           this.$note = $(this.getHtml(this.id, this.theme, this.width, this.height, this.x, this.y, this.text));
+           this.$note = $(this.getHtml(this.id, this.theme, this.width, this.height, this.x, this.y, this.text, this.title));
            return this;
         },
 
@@ -48,10 +49,12 @@ window.note = {};
             this.$container.append(this.getNote());
         },
 
-        getHtml: function (id, theme, width, height, x, y, text) {
+        getHtml: function (id, theme, width, height, x, y, text, title) {
             return  '<div id="note-' + id + '" data-id="'+id+'" data-x="'+x+'" data-y="'+y+'" class="'+note.Note.NOTECLASS+' theme-' + theme + '" style="width:' + width + 'px;height:' + height + 'px;-webkit-transform: translate('+x+'px, '+y+'px);transform: translate('+x+'px, '+y+'px);">' +
-                    '<div class="sn-header">' + note.NoteManager.DEFAULTS.noteOptions.buttons[0]+
-              note.NoteManager.DEFAULTS.noteOptions.buttons[1] +
+                    '<div class="sn-header">'
+                    + note.NoteManager.DEFAULTS.noteOptions.buttons[0]+
+                     '<span class="sn-title">'+title+'</span>'+
+                     note.NoteManager.DEFAULTS.noteOptions.buttons[1] +
                     '</div>' +
                     '<div class="sn-body"><textarea class="sn-editor">' + text + '</textarea></div>' +
                     '</div>';
@@ -68,7 +71,7 @@ window.note = {};
                 x: html.attr('data-x'),
                 y: html.attr('data-y'),
                 text: html.find('.sn-editor').val(),
-                title: "title",
+                title: html.find('.sn-title').val(),
                 theme: theme
             }
         },

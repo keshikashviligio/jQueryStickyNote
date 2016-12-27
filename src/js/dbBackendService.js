@@ -47,13 +47,7 @@ window.note = window.note || {};
 
   note.DbBackendService.prototype.update = function (data) {
     var self = this;
-    this._post(self.options.updateUrl, data).done(function (res) {
-      if (res.success) {
-        self.data = res.data;
-      } else {
-        console.log(res.errorMsg);
-      }
-    });
+    return this._post(self.options.updateUrl, data);
   };
 
   note.DbBackendService.prototype.updateAll = function () {

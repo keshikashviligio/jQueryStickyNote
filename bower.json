@@ -6,7 +6,7 @@
     {
       "name": "Giorgi Keshikashvili",
       "email": "keshikashviligio@gmail.com",
-      "homepage": "https://github.com/keshikashvili-gio"
+      "homepage": "https://github.com/keshikashviligio"
     }
   ],
   "license": "MIT",
@@ -22,7 +22,7 @@
     "ajax",
     "loading"
   ],
-  "homepage": "https://github.com/keshikashvili-gio/jQueryStickyNote",
+  "homepage": "https://github.com/keshikashviligio/jQueryStickyNote",
   "moduleType": [],
   "private": true,
   "ignore": [
